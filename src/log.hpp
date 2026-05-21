@@ -1,7 +1,12 @@
+#ifndef LOG_HPP
+#define LOG_HPP
+
 #ifdef NDEBUG
-    #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
+  #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_WARN
 #else
-    #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
+  #define SPDLOG_ACTIVE_LEVEL SPDLOG_LEVEL_TRACE
 #endif
 
 #include <spdlog/spdlog.h>
+
+#endif

@@ -13,6 +13,7 @@ import Game.Atlases.World;
 import Game.WorldDrawer;
 import Game.World.Generator;
 import Game.World.State;
+import Game.ECS.State;
 
 namespace Game {
   export class Engine {
@@ -27,6 +28,7 @@ namespace Game {
       std::unique_ptr<Game::WorldDrawer> worldDrawer;
 
       Game::World::State world;
+      Game::ECS::State entities;
     public:
       Engine(
         int32_t width,
@@ -37,7 +39,16 @@ namespace Game {
         auto generator = Game::World::Generator(1024, 1024);
         world = generator.generate();
 
-        worldDrawer = std::make_unique<Game::WorldDrawer>(world, texturesLoader, worldAtlas, camera);
+        worldDrawer = std::make_unique<Game::WorldDrawer>(
+          width, height,
+          world, texturesLoader, 
+          worldAtlas, camera
+        );
+      }
+
+      fn tick() -> void {
+        // TODO: move to server
+        entities.tick();
       }
 
       fn input() -> void {
@@ -51,7 +62,6 @@ namespace Game {
       fn draw() const noexcept -> void { 
         BeginDrawing();
           ClearBackground(BLACK);
-          DrawFPS(0, 0);
 
           camera.draw([this]{
             worldDrawer->draw();
@@ -71,6 +81,7 @@ namespace Game {
           );
 
 
+          DrawFPS(0, 0);
         EndDrawing();
       }
   };

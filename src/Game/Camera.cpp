@@ -36,6 +36,7 @@ namespace Game {
 
       fn logic() -> void {
         mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+
         camera.offset = GetMousePosition();
         camera.target = mouseWorldPos;
 

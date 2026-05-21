@@ -35,7 +35,7 @@ namespace Application {
     public:
       int32_t width = 0;
       int32_t height = 0;
-      int32_t fps = 1000;
+      int32_t fps = 10000;
       const char* title = "WindAlive - 0.0.1 alpha";
 
       Window(
@@ -52,14 +52,18 @@ namespace Application {
       {
         SetTraceLogCallback(RaylibLogCallback);
 
-        #ifdef NDEBUG
+        if constexpr (NDEBUG_VAR) {
           SetTraceLogLevel(LOG_WARNING);
-        #else
+        } else {
           SetTraceLogLevel(LOG_ALL);
-        #endif
+        }
 
         InitWindow(width, height, title);
         SetTargetFPS(fps);
+      }
+
+      ~Window()  {
+        CloseWindow();
       }
 
       fn loop() -> void {
@@ -69,7 +73,7 @@ namespace Application {
             logic();
           } catch (const std::exception& err) {
             SPDLOG_ERROR("UNHANDLED EXCEPTION: {}", err.what());
-          } catch (const std::exception& err) {
+          } catch (...) {
             SPDLOG_ERROR("UNHANDLED UNKNOWN EXCEPTION");
           }
 
