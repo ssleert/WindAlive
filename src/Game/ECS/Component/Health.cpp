@@ -3,11 +3,12 @@ module;
 export module Game.ECS.Component.Health;
 
 namespace Game {
-  namespace ECS {
-    namespace Component {
-      export struct Health {
-        int32_t health;
-      };
-    }
-  }
+namespace ECS {
+namespace Component {
+export struct Health
+{
+  int32_t health;
+};
+}
+}
 }

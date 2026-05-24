@@ -6,12 +6,13 @@ import Math.Vector;
 using namespace Math;
 
 namespace Game {
-  namespace ECS {
-    namespace Component {
-      export struct Transform {
-        Vector2 pos;
-        float rotation;
-      };
-    }
-  }
+namespace ECS {
+namespace Component {
+export struct Transform
+{
+  Vector2 pos;
+  float rotation;
+};
+}
+}
 }
