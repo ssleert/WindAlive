@@ -17,8 +17,8 @@ namespace Game {
             const ComponentArray<Component::Physix>& physix
           ) -> void {
             for (const auto& e : transform.getEntities()) {
-              auto& t = transform.get(e);
-              const auto& p = physix.get(e);
+              auto& t = transform[e];
+              const auto& p = physix[e];
               t.pos += p.velocity * 20;
             }
           }

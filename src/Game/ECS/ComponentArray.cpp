@@ -58,28 +58,28 @@ namespace Game {
           entityToIndex.erase(e);
         }
 
-        fn get(Entity e) const noexcept -> const T& {
+        fn operator[](Entity e) const noexcept -> const T& {
           auto it = entityToIndex.find(e);
           if constexpr (!NDEBUG_VAR) {
             if (it == entityToIndex.end()) {
-                SPDLOG_ERROR(
-                  "Entity {} Not exists in ComponentArray<{}>",
-                  e, typeid(T).name()
-                );
+              SPDLOG_ERROR(
+                "Entity {} Not exists in ComponentArray<{}>",
+                e, typeid(T).name()
+              );
             }
           }
 
           return components[it->second];
         }
 
-        fn get(Entity e) noexcept -> T& {
+        fn operator[](Entity e) noexcept -> T& {
           auto it = entityToIndex.find(e);
           if constexpr (!NDEBUG_VAR) {
             if (it == entityToIndex.end()) {
-                SPDLOG_ERROR(
-                  "Entity {} Not exists in ComponentArray<{}>",
-                  e, typeid(T).name()
-                );
+              SPDLOG_ERROR(
+                "Entity {} Not exists in ComponentArray<{}>",
+                e, typeid(T).name()
+              );
             }
           }
 
@@ -89,6 +89,7 @@ namespace Game {
         fn getEntities() const noexcept -> const std::vector<Entity>& { 
           return entities; 
         }
+
         fn getComponents() noexcept -> std::vector<T>& { 
           return components; 
         }

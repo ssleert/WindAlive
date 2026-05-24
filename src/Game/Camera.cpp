@@ -27,7 +27,7 @@ namespace Game {
       fn input() -> void {
         wheel = GetMouseWheelMove();
 
-        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+        if (IsMouseButtonDown(MOUSE_BUTTON_MIDDLE)) {
           Vector2 delta = GetMouseDelta();
           delta = Vector2Scale(delta, -1.0f/camera.zoom);
           camera.target = Vector2Add(camera.target, delta);

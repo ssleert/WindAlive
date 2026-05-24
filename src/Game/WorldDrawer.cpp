@@ -46,22 +46,6 @@ namespace Game {
         auto right = (screenWidth - c.offset.x) / c.zoom + c.target.x;
         auto bottom = (screenHeight - c.offset.y) / c.zoom + c.target.y;
 
-
-        //for (const auto& field : world.fields)  {
-        //  DrawTexturePro(
-        //    texturesLoader.worldTiles,
-        //    worldAtlas.GetTextureRectangle(field.tile),
-        //    (Rectangle){
-        //      .x = (float)(field.x * world.fieldSize),
-        //      .y = (float)(field.y * world.fieldSize),
-        //      .width = (float)world.fieldSize,
-        //      .height = (float)world.fieldSize
-        //    },
-        //    (Vector2){},
-        //    0,
-        //    WHITE
-        //  );
-        //}
         for (const auto& field : world.fields) {
           float x = (float)(field.x * world.fieldSize);
           float y = (float)(field.y * world.fieldSize);

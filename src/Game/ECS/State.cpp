@@ -51,6 +51,8 @@ namespace Game {
           transformAlive.add(entity, Component::Transform{
             .pos = pos,
           });
+
+          physixAlive.add(entity, Component::Physix{});
           attributesAlive.add(entity, Component::Attributes{
             .type = Component::Attributes::Type::Human,
           });
@@ -60,8 +62,8 @@ namespace Game {
 
         fn addPointOfVelocity(Vector2 pos) -> void {
           for (const auto& e : physixAlive.getEntities()) {
-            auto& p = physixAlive.get(e);
-            const auto& t = transformAlive.get(e);
+            auto& p = physixAlive[e];
+            const auto& t = transformAlive[e];
 
             auto sub = pos - t.pos;
             p.velocity = sub / sub.length(); 

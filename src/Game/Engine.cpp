@@ -3,6 +3,7 @@ module;
 #include <raylib.h>
 #include <rlgl.h>
 #include <raymath.h>
+#include <vector>
 #include <memory>
 #include <windalive.hpp>
 export module Game.Engine;
@@ -14,6 +15,8 @@ import Game.WorldDrawer;
 import Game.World.Generator;
 import Game.World.State;
 import Game.ECS.State;
+
+import Math.Vector;
 
 namespace Game {
   export class Engine {
@@ -52,6 +55,15 @@ namespace Game {
       }
 
       fn input() -> void {
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+          auto mpos = GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
+          entities.addPointOfVelocity(Math::Vector2{mpos.x, mpos.y});
+        }
+
+        if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
+          auto mpos = GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
+          entities.addHuman(Math::Vector2{mpos.x, mpos.y});
+        }
         camera.input();
       }
 
@@ -67,6 +79,17 @@ namespace Game {
             worldDrawer->draw();
 
             DrawCircle(200, 200, 30, RED);
+
+            for (const auto& e : entities.transformAlive.getEntities()) {
+              auto t = entities.transformAlive[e];
+
+              DrawRectangleRec(Rectangle{
+                .x = t.pos.x,
+                .y = t.pos.y,
+                .width = 60,
+                .height = 60,
+              }, WHITE);
+            }
           });
 
           DrawCircleV(GetMousePosition(), 4, DARKGRAY);
