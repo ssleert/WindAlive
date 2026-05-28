@@ -15,16 +15,15 @@ private:
   const int32_t width = 64;
   const int32_t height = 64;
 
-  const std::vector<Vector2> mapping = { { 0, 0 },
-                                         { 1, 0 },
-                                         { 2, 0 },
-                                         { 3, 0 },
-                                         { 4, 0 } };
+  const std::vector<Vector2> mapping = {
+    { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 },  { 4, 0 },  { 5, 0 }, { 6, 0 },
+    { 7, 0 }, { 8, 0 }, { 9, 0 }, { 10, 0 }, { 11, 0 }, { 0, 1 },
+  };
 
 public:
-  fn GetTextureRectangle(Game::World::Tile index) const -> Rectangle
+  fn GetTextureRectangle(Game::World::Tile tile) const -> Rectangle
   {
-    auto indexTile = mapping[(int32_t)index % mapping.size()];
+    auto indexTile = mapping[(int32_t)tile.value % mapping.size()];
     return {
       .x = (float)(indexTile.x * width),
       .y = (float)(indexTile.y * height),

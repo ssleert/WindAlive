@@ -10,6 +10,13 @@ if(UNIX AND NOT APPLE)
   set(LIBCXX_FLAGS -stdlib=libc++ -fexperimental-library)
 endif()
 
+if(USE_ANGLE_FROM_CHROMIUM)
+  set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
+  set(_GLFW_EGL_LIBRARY libEGL.so)
+  set(_GLFW_GLESV2_LIBRARY libGLESv2.so)
+  set(LIBANGLE /usr/lib/chromium/libEGL.so /usr/lib/chromium/libGLESv2.so)
+endif()
+
 project(windalive LANGUAGES CXX)
 
 add_compile_options(
@@ -22,8 +29,8 @@ add_compile_options(
 )
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-  add_compile_options(-fsanitize=address)
-  add_link_options(-fsanitize=address)
+  add_compile_options(-fsanitize=address,undefined)
+  add_link_options(-fsanitize=address,undefined)
 endif()
 
 add_executable(windalive src/windalive.cpp)
@@ -46,4 +53,5 @@ target_link_libraries(windalive PRIVATE
   raylib
   spdlog
   ${LIBCXX}
+  ${LIBANGLE}
 )

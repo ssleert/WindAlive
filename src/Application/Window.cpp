@@ -1,5 +1,4 @@
 module;
-#include "spdlog/spdlog.h"
 #include <exception>
 #include <log.hpp>
 #include <raylib.h>

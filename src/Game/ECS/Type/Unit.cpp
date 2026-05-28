@@ -1,0 +1,86 @@
+module;
+#include <stdint.h>
+#include <vector>
+#include <windalive.hpp>
+export module Game.ECS.Type.Unit;
+
+import Game.ECS.Entity;
+import Game.ECS.Arrays;
+import Game.ECS.Pathfinding;
+import Game.ECS.Component.Physix;
+import Game.ECS.Component.Transform;
+import Game.ECS.Component.Attributes;
+import Game.ECS.Component.Path;
+import Game.World.State;
+import Math.Vector;
+
+using namespace Math;
+
+namespace Game {
+namespace ECS {
+namespace Type {
+export class Unit
+{
+private:
+  Game::ECS::Arrays& arrays;
+  Game::World::State& world;
+
+  std::vector<Entity> freeEntities;
+  Entity nextEntity = 1;
+
+public:
+  Unit(Game::ECS::Arrays& arrays, Game::World::State& world)
+    : arrays(arrays)
+    , world(world)
+  {
+  }
+
+  fn create() -> Entity
+  {
+    if (!freeEntities.empty()) {
+      Entity e = freeEntities.back();
+      freeEntities.pop_back();
+
+      return e;
+    }
+
+    return nextEntity++;
+  }
+
+  fn add(Vector2 pos) -> void
+  {
+    auto entity = create();
+
+    arrays.transformUnit.add(entity,
+                             Component::Transform{
+                               .pos = pos,
+                             });
+
+    arrays.physixUnit.add(entity, Component::Physix{});
+    arrays.attributesUnit.add(entity,
+                              Component::Attributes{
+                                .type = Component::Attributes::Type::Human,
+                              });
+  }
+
+  fn setDestination(Entity e, Vector2 target) -> void
+  {
+    auto& transform = arrays.transformUnit[e];
+
+    // TODO: add task to threadpool
+    auto path = Pathfinding::findPath(world, transform.pos, target);
+
+    if (path.empty()) {
+      // Optional: log warning
+      return;
+    }
+
+    arrays.pathUnit.add(e,
+                        Component::Path{ .finalPoint = target,
+                                         .completed = false,
+                                         .points = std::move(path) });
+  }
+};
+}
+}
+}

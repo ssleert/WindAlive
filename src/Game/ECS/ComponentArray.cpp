@@ -93,6 +93,10 @@ public:
   }
 
   fn getComponents() noexcept -> std::vector<T>& { return components; }
+  fn getComponents() const noexcept -> const std::vector<T>&
+  {
+    return components;
+  }
 };
 }
 }

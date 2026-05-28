@@ -32,27 +32,30 @@ public:
 
   fn input() -> void
   {
-    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-      auto mpos = GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
-      entities.addPointOfVelocity(Math::Vector2{ mpos.x, mpos.y });
-    }
+    // if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+    //   const auto mpos = GetScreenToWorld2D(GetMousePosition(),
+    //   camera.getCamera()); entities.unit.addPointOfVelocity(Math::Vector2{
+    //   mpos.x, mpos.y });
+    // }
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
-      auto mpos = GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
-      entities.addHuman(Math::Vector2{ mpos.x, mpos.y });
+      const auto mpos =
+        GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
+      entities.unit.add(Math::Vector2{ mpos.x, mpos.y });
     }
   }
 
   // TODO: add occlusion culling
   fn draw() const noexcept -> void
   {
-    for (const auto& e : entities.transformAlive.getEntities()) {
-      auto t = entities.transformAlive[e];
+    for (size_t e = 0; e < entities.arrays.transformUnit.getComponents().size();
+         ++e) {
+      auto t = entities.arrays.transformUnit.getComponents()[e];
       DrawRectangleRec(
         Rectangle{
           .x = t.pos.x,
           .y = t.pos.y,
-          .width = 60,
-          .height = 60,
+          .width = 30,
+          .height = 30,
         },
         WHITE);
     }

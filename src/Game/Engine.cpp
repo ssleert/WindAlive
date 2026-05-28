@@ -11,6 +11,7 @@ export module Game.Engine;
 import Game.Camera;
 import Game.TexturesLoader;
 import Game.Atlases.World;
+import Game.Atlases.Tree;
 import Game.WorldDrawer;
 import Game.EntityDrawer;
 import Game.World.Generator;
@@ -28,8 +29,11 @@ private:
 
   const Game::TexturesLoader texturesLoader;
   const Game::Atlases::World worldAtlas;
+  const Game::Atlases::Tree treeAtlas;
 
   Game::Camera camera;
+
+  // TODO: rewrite to late initialization
   std::unique_ptr<Game::WorldDrawer> worldDrawer;
   std::unique_ptr<Game::EntityDrawer> entityDrawer;
 
@@ -40,12 +44,13 @@ public:
   Engine(int32_t width, int32_t height)
     : width(width)
     , height(height)
+    , entities(world)
   {
     auto generator = Game::World::Generator(1024, 1024);
     world = generator.generate();
 
     worldDrawer = std::make_unique<Game::WorldDrawer>(
-      width, height, world, texturesLoader, worldAtlas, camera);
+      width, height, world, texturesLoader, worldAtlas, treeAtlas, camera);
 
     entityDrawer =
       std::make_unique<Game::EntityDrawer>(width, height, entities, camera);
@@ -63,16 +68,21 @@ public:
     camera.input();
   }
 
-  fn logic() -> void { camera.logic(); }
+  fn logic() -> void
+  {
+    camera.logic();
+    worldDrawer->logic();
+  }
 
   fn draw() const noexcept -> void
   {
     BeginDrawing();
-    ClearBackground(BLACK);
+    ClearBackground(Color{ 52, 48, 56, 255 });
 
     camera.draw([this] {
-      worldDrawer->draw();
+      worldDrawer->drawTiles();
       entityDrawer->draw();
+      worldDrawer->drawObjects();
 
       DrawCircle(200, 200, 30, RED);
     });

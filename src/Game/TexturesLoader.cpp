@@ -7,8 +7,13 @@ export class TexturesLoader
 {
 public:
   Texture2D worldTiles;
+  Texture2D treeTiles;
 
-  TexturesLoader() { worldTiles = LoadTexture("./asset/world.png"); }
+  TexturesLoader()
+  {
+    worldTiles = LoadTexture("./asset/world.png");
+    treeTiles = LoadTexture("./asset/tree.png");
+  }
 
   ~TexturesLoader() { UnloadTexture(worldTiles); }
 };

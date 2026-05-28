@@ -1,5 +1,6 @@
 module;
 #include <cmath>
+#include <format>
 #include <windalive.hpp>
 export module Math.Vector;
 
@@ -71,6 +72,8 @@ struct Vector2
       return { 0.0f, 0.0f };
     return *this /= len;
   }
+
+  fn to_string() const -> std::string { return std::format("{{{},{}}}", x, y); }
 };
 
 struct Vector3
@@ -153,6 +156,11 @@ struct Vector3
     if (len == 0.0f)
       return { 0.0f, 0.0f, 0.0f };
     return *this /= len;
+  }
+
+  fn to_string() const -> std::string
+  {
+    return std::format("{{{},{},{}}}", x, y, z);
   }
 };
 }
