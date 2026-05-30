@@ -1,4 +1,5 @@
 module;
+#include <log.hpp>
 #include <raylib.h>
 #include <stdint.h>
 #include <vector>
@@ -32,11 +33,11 @@ public:
 
   fn input() -> void
   {
-    // if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
-    //   const auto mpos = GetScreenToWorld2D(GetMousePosition(),
-    //   camera.getCamera()); entities.unit.addPointOfVelocity(Math::Vector2{
-    //   mpos.x, mpos.y });
-    // }
+    if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) {
+      const auto mpos =
+        GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
+      entities.unit.setDestinationAll(Math::Vector2{ mpos.x, mpos.y });
+    }
     if (IsMouseButtonDown(MOUSE_BUTTON_LEFT)) {
       const auto mpos =
         GetScreenToWorld2D(GetMousePosition(), camera.getCamera());

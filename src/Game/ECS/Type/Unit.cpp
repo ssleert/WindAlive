@@ -1,4 +1,5 @@
 module;
+#include <log.hpp>
 #include <stdint.h>
 #include <vector>
 #include <windalive.hpp>
@@ -61,6 +62,7 @@ public:
                               Component::Attributes{
                                 .type = Component::Attributes::Type::Human,
                               });
+    arrays.pathUnit.add(entity, Component::Path{});
   }
 
   fn setDestination(Entity e, Vector2 target) -> void
@@ -79,6 +81,24 @@ public:
                         Component::Path{ .finalPoint = target,
                                          .completed = false,
                                          .points = std::move(path) });
+  }
+
+  fn setDestinationAll(Vector2 target) -> void
+  {
+    const auto& transform = arrays.transformUnit.getComponents();
+    auto& paths = arrays.pathUnit.getComponents();
+
+    for (size_t i = 0; i < transform.size(); ++i) {
+      auto path = Pathfinding::findPath(world, transform[i].pos, target);
+
+      if (path.empty()) {
+        return;
+      }
+
+      paths[i] = Component::Path{ .finalPoint = target,
+                                  .completed = false,
+                                  .points = std::move(path) };
+    }
   }
 };
 }

@@ -8,6 +8,7 @@ export module Game.ECS.State;
 import Game.ECS.Arrays;
 import Game.ECS.Entity;
 import Game.ECS.System.Movement;
+import Game.ECS.System.PathFollowing;
 import Game.ECS.Type.Unit;
 import Game.World.State;
 import Math.Vector;
@@ -20,22 +21,17 @@ export class State
 {
 public:
   BS::thread_pool<BS::tp::none> pool;
+  ECS::Arrays arrays;
+  System::Movement movementSystem;
+  System::PathFollowing pathFollowingSystem;
+  Type::Unit unit;
 
   Game::World::State& world;
 
-  ECS::Arrays arrays;
-
-  System::Movement movementSystem;
-
-  Type::Unit unit;
-
-  State(
-
-    Game::World::State& world
-
-    )
+  State(Game::World::State& world)
     : pool(std::thread::hardware_concurrency)
     , movementSystem(pool)
+    , pathFollowingSystem(pool)
     , world(world)
     , unit(arrays, world)
   {
@@ -43,6 +39,9 @@ public:
 
   fn tick() noexcept -> void
   {
+    pathFollowingSystem.apply(
+      arrays.transformUnit, arrays.physixUnit, arrays.pathUnit);
+    pool.wait();
     movementSystem.apply(arrays.transformUnit, arrays.physixUnit);
     pool.wait();
   }

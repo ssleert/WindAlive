@@ -5,13 +5,15 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-if(UNIX AND NOT APPLE)
-  set(LIBCXX /lib/libc++.a /lib/libc++abi.a)
-  set(LIBCXX_FLAGS -stdlib=libc++ -fexperimental-library)
+
+if(USE_STDCXX)
+  if(UNIX AND NOT APPLE)
+    set(LIBCXX /lib/libc++.a /lib/libc++abi.a)
+    set(LIBCXX_FLAGS -stdlib=libc++ -fexperimental-library)
+  endif()
 endif()
 
 if(USE_ANGLE_FROM_CHROMIUM)
-  set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
   set(_GLFW_EGL_LIBRARY libEGL.so)
   set(_GLFW_GLESV2_LIBRARY libGLESv2.so)
   set(LIBANGLE /usr/lib/chromium/libEGL.so /usr/lib/chromium/libGLESv2.so)
@@ -40,7 +42,9 @@ list(FILTER MODULES EXCLUDE REGEX windalive.cpp)
 
 target_sources(windalive PRIVATE FILE_SET CXX_MODULES FILES ${MODULES})
 
+set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
 add_subdirectory(libs/raylib)
+
 add_subdirectory(libs/spdlog)
 add_subdirectory(libs/mimalloc)
 

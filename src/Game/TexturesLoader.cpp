@@ -15,6 +15,10 @@ public:
     treeTiles = LoadTexture("./asset/tree.png");
   }
 
-  ~TexturesLoader() { UnloadTexture(worldTiles); }
+  ~TexturesLoader()
+  {
+    UnloadTexture(worldTiles);
+    UnloadTexture(treeTiles);
+  }
 };
 }
