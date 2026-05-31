@@ -4,7 +4,6 @@ set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 if(USE_STDCXX)
   if(UNIX AND NOT APPLE)
@@ -22,13 +21,19 @@ endif()
 project(windalive LANGUAGES CXX)
 
 add_compile_options(
-  -ffast-math 
-  -march=native 
-  -mtune=native 
   -fno-strict-aliasing
   -Wno-nan-infinity-disabled
   ${LIBCXX_FLAGS}
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+  add_compile_options(
+    -ffast-math 
+    -march=native 
+    -mtune=native 
+  )
+endif()
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
   add_compile_options(-fsanitize=address,undefined)
@@ -46,7 +51,11 @@ set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
 add_subdirectory(libs/raylib)
 
 add_subdirectory(libs/spdlog)
-add_subdirectory(libs/mimalloc)
+
+if(CMAKE_BUILD_TYPE STREQUAL "Release")
+  add_subdirectory(libs/mimalloc)
+  set(LIBMIMALLOC mimalloc)
+endif()
 
 target_include_directories(windalive PRIVATE 
   src 
@@ -56,6 +65,7 @@ target_include_directories(windalive PRIVATE
 target_link_libraries(windalive PRIVATE
   raylib
   spdlog
+  ${LIBMIMALLOC}
   ${LIBCXX}
   ${LIBANGLE}
 )

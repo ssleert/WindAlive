@@ -33,7 +33,7 @@ public:
         for (size_t i = start; i < end; ++i) {
           auto& t = tc[i];
           const auto& p = pc[i];
-          t.pos += p.velocity * 20;
+          t.pos += p.velocity * 10;
         }
       });
   }

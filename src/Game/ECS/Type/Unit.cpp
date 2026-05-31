@@ -1,4 +1,5 @@
 module;
+#include <BS_thread_pool.hpp>
 #include <log.hpp>
 #include <stdint.h>
 #include <vector>
@@ -26,12 +27,17 @@ private:
   Game::ECS::Arrays& arrays;
   Game::World::State& world;
 
+  BS::thread_pool<BS::tp::none>& pool;
+
   std::vector<Entity> freeEntities;
   Entity nextEntity = 1;
 
 public:
-  Unit(Game::ECS::Arrays& arrays, Game::World::State& world)
-    : arrays(arrays)
+  Unit(BS::thread_pool<BS::tp::none>& threadPool,
+       Game::ECS::Arrays& arrays,
+       Game::World::State& world)
+    : pool(threadPool)
+    , arrays(arrays)
     , world(world)
   {
   }
@@ -77,28 +83,25 @@ public:
       return;
     }
 
-    arrays.pathUnit.add(e,
-                        Component::Path{ .finalPoint = target,
-                                         .completed = false,
-                                         .points = std::move(path) });
+    arrays.pathUnit.add(e, Component::Path{ .points = std::move(path) });
   }
 
   fn setDestinationAll(Vector2 target) -> void
   {
-    const auto& transform = arrays.transformUnit.getComponents();
-    auto& paths = arrays.pathUnit.getComponents();
+    const auto& components = arrays.transformUnit.getComponents();
 
-    for (size_t i = 0; i < transform.size(); ++i) {
-      auto path = Pathfinding::findPath(world, transform[i].pos, target);
+    pool.detach_blocks(
+      0, components.size(), [this, target = target](size_t start, size_t end) {
+        const auto& transform = arrays.transformUnit.getComponents();
+        auto& paths = arrays.pathUnit.getComponents();
 
-      if (path.empty()) {
-        return;
-      }
+        for (size_t i = start; i < end; ++i) {
+          auto path = Pathfinding::findPath(world, transform[i].pos, target);
+          std::reverse(path.begin(), path.end());
 
-      paths[i] = Component::Path{ .finalPoint = target,
-                                  .completed = false,
-                                  .points = std::move(path) };
-    }
+          paths[i] = Component::Path{ .points = std::move(path) };
+        }
+      });
   }
 };
 }

@@ -61,10 +61,10 @@ public:
   {
     const auto& c = camera.getCamera();
 
-    left = (0 - c.offset.x) / c.zoom + c.target.x;
-    top = (0 - c.offset.y) / c.zoom + c.target.y;
-    right = (screenWidth - c.offset.x) / c.zoom + c.target.x;
-    bottom = (screenHeight - c.offset.y) / c.zoom + c.target.y;
+    left = (0 - c.offset.x-world.fieldSize*2) / c.zoom + c.target.x;
+    top = (0 - c.offset.y-world.fieldSize*2) / c.zoom + c.target.y;
+    right = (screenWidth - c.offset.x+world.fieldSize*2) / c.zoom + c.target.x;
+    bottom = (screenHeight - c.offset.y+world.fieldSize*2) / c.zoom + c.target.y;
   }
 
   // TODO: rewrite cleaner
@@ -96,7 +96,7 @@ public:
   {
     for (const auto& field : fieldsWithObjects) {
       const float x = (float)(field->x * world.fieldSize);
-      const float y = (float)(field->y * world.fieldSize);
+      const float y = (float)((field->y-1) * world.fieldSize);
 
       // TODO: move check for object type to another func
       //       and return pair of texture and rectangle

@@ -38,49 +38,41 @@ public:
     if (pathComponents.empty())
       return;
 
-    pool.detach_blocks(0, pathComponents.size(), [&, speed=speed](size_t start, size_t end) {
-      auto& transforms = transform.getComponents();
-      auto& physixes = physix.getComponents();
-      auto& paths = pathArray.getComponents();
+    pool.detach_blocks(
+      0, pathComponents.size(), [&, speed = speed](size_t start, size_t end) {
+        auto& transforms = transform.getComponents();
+        auto& physixes = physix.getComponents();
+        auto& paths = pathArray.getComponents();
 
-      for (size_t i = start; i < end; ++i) {
-        auto& p = paths[i];
-        auto& t = transforms[i];
-        auto& ph = physixes[i];
+        for (size_t i = start; i < end; ++i) {
+          auto& path = paths[i];
+          auto& transform = transforms[i];
+          auto& physix = physixes[i];
 
-        if (p.completed || p.points.empty()) {
-          ph.velocity = { 0, 0 };
-          continue;
-        }
-
-        Vector2 target = p.points.front();
-        Vector2 dir = target - t.pos;
-        float distSq = dir.lengthSquared();
-
-        // Reached current waypoint
-        if (distSq < 64.0f) // 8 pixels tolerance
-        {
-          p.points.erase(p.points.begin());
-
-          if (p.points.empty()) {
-            p.completed = true;
-            ph.velocity = { 0, 0 };
+          if (path.points.empty()) {
             continue;
           }
 
-          target = p.points.front();
-          dir = target - t.pos;
-          distSq = dir.lengthSquared();
-        }
+          const auto& lastPoint = path.points.back();
+          auto div = lastPoint - transform.pos;
 
-        if (distSq > 0.001f) {
-          dir = dir.normalize();
-          ph.velocity = dir * speed;
-        } else {
-          ph.velocity = { 0, 0 };
+          const auto length = div.length();
+          if (length < 10.0f) {
+            path.points.pop_back();
+
+            if (path.points.empty()) {
+              physix.velocity = Vector2{ 0, 0 };
+              continue;
+            }
+
+            const auto& lastPoint = path.points.back();
+
+            div = lastPoint - transform.pos;
+          }
+
+          physix.velocity = div.normalize();
         }
-      }
-    });
+      });
   }
 };
 }

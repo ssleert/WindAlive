@@ -1,7 +1,6 @@
 module;
 #include <BS_thread_pool.hpp>
 #include <stdint.h>
-#include <vector>
 #include <windalive.hpp>
 export module Game.ECS.State;
 
@@ -33,12 +32,13 @@ public:
     , movementSystem(pool)
     , pathFollowingSystem(pool)
     , world(world)
-    , unit(arrays, world)
+    , unit(pool, arrays, world)
   {
   }
 
   fn tick() noexcept -> void
   {
+    pool.wait();
     pathFollowingSystem.apply(
       arrays.transformUnit, arrays.physixUnit, arrays.pathUnit);
     pool.wait();

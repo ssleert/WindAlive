@@ -11,9 +11,6 @@ namespace ECS {
 namespace Component {
 export struct Path
 {
-  Vector2 finalPoint;
-  bool completed;
-
   std::vector<Vector2> points;
 };
 }

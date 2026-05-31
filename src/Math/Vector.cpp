@@ -65,12 +65,12 @@ struct Vector2
 
   fn length() const -> float { return std::sqrtf(lengthSquared()); }
 
-  fn normalize() -> Vector2
+  fn normalize() const -> Vector2
   {
     float len = length();
     if (len == 0.0f)
       return { 0.0f, 0.0f };
-    return *this /= len;
+    return *this / len;
   }
 
   fn to_string() const -> std::string { return std::format("{{{},{}}}", x, y); }
@@ -150,12 +150,12 @@ struct Vector3
 
   fn length() const -> float { return std::sqrtf(lengthSquared()); }
 
-  fn normalize() -> Vector3
+  fn normalize() const -> Vector3
   {
     float len = length();
     if (len == 0.0f)
       return { 0.0f, 0.0f, 0.0f };
-    return *this /= len;
+    return *this / len;
   }
 
   fn to_string() const -> std::string
