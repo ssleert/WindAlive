@@ -70,6 +70,7 @@ public:
       SetTraceLogLevel(LOG_ALL);
     }
 
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(width, height, title);
     SetTargetFPS(fps);
   }

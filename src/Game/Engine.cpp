@@ -1,7 +1,9 @@
 module;
+#include <imgui.h>
 #include <memory>
 #include <raylib.h>
 #include <raymath.h>
+#include <rlImGui.h>
 #include <rlgl.h>
 #include <stdint.h>
 #include <vector>
@@ -50,11 +52,16 @@ public:
     world = generator.generate();
 
     worldDrawer = std::make_unique<Game::WorldDrawer>(
-      width, height, world, texturesLoader, worldAtlas, treeAtlas, camera);
+      world, texturesLoader, worldAtlas, treeAtlas, camera);
 
     entityDrawer =
-      std::make_unique<Game::EntityDrawer>(width, height, entities, camera);
+      std::make_unique<Game::EntityDrawer>(entities, camera);
+
+    rlImGuiSetup(
+      true); // sets up ImGui with ether a dark or light default theme
   }
+
+  ~Engine() { rlImGuiShutdown(); }
 
   fn tick() -> void
   {
@@ -64,6 +71,13 @@ public:
 
   fn input() -> void
   {
+    ImGuiIO& io = ImGui::GetIO();
+    bool imguiWantsInput = io.WantCaptureMouse || io.WantCaptureKeyboard ||
+                           ImGui::IsAnyItemActive() ||
+                           ImGui::IsAnyItemHovered();
+    if (imguiWantsInput) {
+      return;
+    }
     entityDrawer->input();
     camera.input();
   }
@@ -71,10 +85,11 @@ public:
   fn logic() -> void
   {
     camera.logic();
+    entityDrawer->logic();
     worldDrawer->logic();
   }
 
-  fn draw() const noexcept -> void
+  fn draw() noexcept -> void
   {
     BeginDrawing();
     ClearBackground(Color{ 52, 48, 56, 255 });
@@ -86,6 +101,15 @@ public:
 
       DrawCircle(200, 200, 30, RED);
     });
+
+    rlImGuiBegin();
+    ImGui::Begin("My DearImGui Window");
+    ImGui::Text("hello, world");
+    ImGui::End();
+
+    bool show = true;
+    ImGui::ShowDemoWindow(&show);
+    rlImGuiEnd();
 
     DrawCircleV(GetMousePosition(), 4, DARKGRAY);
     DrawTextEx(GetFontDefault(),

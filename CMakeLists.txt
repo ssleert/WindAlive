@@ -5,25 +5,27 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if(USE_STDCXX)
-  if(UNIX AND NOT APPLE)
-    set(LIBCXX /lib/libc++.a /lib/libc++abi.a)
-    set(LIBCXX_FLAGS -stdlib=libc++ -fexperimental-library)
-  endif()
-endif()
-
 if(USE_ANGLE_FROM_CHROMIUM)
   set(_GLFW_EGL_LIBRARY libEGL.so)
   set(_GLFW_GLESV2_LIBRARY libGLESv2.so)
   set(LIBANGLE /usr/lib/chromium/libEGL.so /usr/lib/chromium/libGLESv2.so)
 endif()
 
-project(windalive LANGUAGES CXX)
+project(windalive LANGUAGES CXX C)
+
+if(USE_STDCXX)
+  add_compile_options(
+    -stdlib=libc++
+  )
+  link_libraries(
+    c++.a
+    c++abi.a
+  )
+endif()
 
 add_compile_options(
   -fno-strict-aliasing
   -Wno-nan-infinity-disabled
-  ${LIBCXX_FLAGS}
 )
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
@@ -36,36 +38,52 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
 endif()
 
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
-  add_compile_options(-fsanitize=address,undefined)
-  add_link_options(-fsanitize=address,undefined)
+  if(NOT DEBUGGER)
+    add_compile_options(-fsanitize=address,undefined)
+    add_link_options(-fsanitize=address,undefined)
+  endif()
+
+  add_compile_options(-g3)
+  add_link_options(-g3)
 endif()
 
-add_executable(windalive src/windalive.cpp)
 
-file(GLOB_RECURSE MODULES src/*.cpp)
-list(FILTER MODULES EXCLUDE REGEX windalive.cpp)
-
-target_sources(windalive PRIVATE FILE_SET CXX_MODULES FILES ${MODULES})
+if(USE_MIMALLOC)
+  add_subdirectory(libs/mimalloc)
+  link_libraries(
+    mimalloc-static
+  )
+endif()
 
 set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
 add_subdirectory(libs/raylib)
 
 add_subdirectory(libs/spdlog)
 
-if(CMAKE_BUILD_TYPE STREQUAL "Release")
-  add_subdirectory(libs/mimalloc)
-  set(LIBMIMALLOC mimalloc)
-endif()
+add_executable(windalive src/windalive.cpp 
+  libs/rlImGui/rlImGui.cpp
+  libs/imgui/imgui.cpp
+  libs/imgui/imgui_demo.cpp
+  libs/imgui/imgui_draw.cpp
+  libs/imgui/imgui_tables.cpp
+  libs/imgui/imgui_widgets.cpp
+)
+
+file(GLOB_RECURSE MODULES src/*.cpp)
+list(FILTER MODULES EXCLUDE REGEX windalive.cpp)
+
+target_sources(windalive PRIVATE FILE_SET CXX_MODULES FILES ${MODULES})
 
 target_include_directories(windalive PRIVATE 
   src 
   libs/thread-pool/include
+  libs/rlImGui
+  libs/imgui
 )
 
 target_link_libraries(windalive PRIVATE
   raylib
   spdlog
-  ${LIBMIMALLOC}
-  ${LIBCXX}
   ${LIBANGLE}
 )
+

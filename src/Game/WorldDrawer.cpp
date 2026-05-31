@@ -4,20 +4,18 @@ module;
 #include <vector>
 #include <windalive.hpp>
 export module Game.WorldDrawer;
-
 import Game.World.State;
 import Game.World.Field;
 import Game.TexturesLoader;
 import Game.Atlases.World;
 import Game.Atlases.Tree;
 import Game.Camera;
-
 namespace Game {
 export class WorldDrawer
 {
 private:
-  const int32_t screenWidth;
-  const int32_t screenHeight;
+  int32_t screenWidth;
+  int32_t screenHeight;
 
   const Game::World::State& world;
   const Game::TexturesLoader& texturesLoader;
@@ -29,16 +27,13 @@ private:
   float top;
   float right;
   float bottom;
-
   float w;
   float h;
 
   std::vector<const Game::World::Field*> fieldsWithObjects;
 
 public:
-  WorldDrawer(int32_t screenWidth,
-              int32_t screenHeight,
-              const Game::World::State& world,
+  WorldDrawer(const Game::World::State& world,
               const Game::TexturesLoader& texturesLoader,
               const Game::Atlases::World& worldAtlas,
               const Game::Atlases::Tree& treeAtlas,
@@ -48,8 +43,6 @@ public:
     , worldAtlas(worldAtlas)
     , treeAtlas(treeAtlas)
     , camera(camera)
-    , screenWidth(screenWidth)
-    , screenHeight(screenHeight)
   {
     fieldsWithObjects.reserve(world.width * world.height * 0.4f);
 
@@ -59,12 +52,17 @@ public:
 
   fn logic() -> void
   {
+    screenWidth = GetScreenWidth();
+    screenHeight = GetScreenHeight();
+
     const auto& c = camera.getCamera();
 
-    left = (0 - c.offset.x-world.fieldSize*2) / c.zoom + c.target.x;
-    top = (0 - c.offset.y-world.fieldSize*2) / c.zoom + c.target.y;
-    right = (screenWidth - c.offset.x+world.fieldSize*2) / c.zoom + c.target.x;
-    bottom = (screenHeight - c.offset.y+world.fieldSize*2) / c.zoom + c.target.y;
+    left = (0 - c.offset.x - world.fieldSize * 2) / c.zoom + c.target.x;
+    top = (0 - c.offset.y - world.fieldSize * 2) / c.zoom + c.target.y;
+    right =
+      (screenWidth - c.offset.x + world.fieldSize * 2) / c.zoom + c.target.x;
+    bottom =
+      (screenHeight - c.offset.y + world.fieldSize * 2) / c.zoom + c.target.y;
   }
 
   // TODO: rewrite cleaner
@@ -96,10 +94,10 @@ public:
   {
     for (const auto& field : fieldsWithObjects) {
       const float x = (float)(field->x * world.fieldSize);
-      const float y = (float)((field->y-1) * world.fieldSize);
+      const float y = (float)((field->y - 1) * world.fieldSize);
 
       // TODO: move check for object type to another func
-      //       and return pair of texture and rectangle
+      // and return pair of texture and rectangle
       if (field->object.isTree()) {
         DrawTexturePro(
           texturesLoader.treeTiles,

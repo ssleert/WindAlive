@@ -14,20 +14,17 @@ namespace Game {
 export class EntityDrawer
 {
 private:
-  const int32_t screenWidth;
-  const int32_t screenHeight;
+  int32_t screenWidth;
+  int32_t screenHeight;
   const Game::Camera& camera;
   Game::ECS::State& entities;
 
 public:
-  EntityDrawer(int32_t screenWidth,
-               int32_t screenHeight,
+  EntityDrawer(
                Game::ECS::State& entities,
                const Game::Camera& camera)
     : camera(camera)
     , entities(entities)
-    , screenWidth(screenWidth)
-    , screenHeight(screenHeight)
   {
   }
 
@@ -43,6 +40,12 @@ public:
         GetScreenToWorld2D(GetMousePosition(), camera.getCamera());
       entities.unit.add(Math::Vector2{ mpos.x, mpos.y });
     }
+  }
+
+  fn logic() -> void
+  {
+    screenWidth = GetScreenWidth();
+    screenHeight = GetScreenHeight();
   }
 
   // TODO: add occlusion culling
