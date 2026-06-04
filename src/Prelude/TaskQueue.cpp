@@ -1,6 +1,6 @@
 module;
-#include <functional>
 #include <BS_thread_pool.hpp>
+#include <functional>
 #include <mutex>
 #include <vector>
 #include <windalive.hpp>
@@ -15,7 +15,11 @@ private:
   std::mutex mtx;
 
 public:
-  TaskQueue() : pool(1) { tasks.reserve(100); }
+  TaskQueue()
+    : pool(1)
+  {
+    tasks.reserve(100);
+  }
 
   TaskQueue(const TaskQueue& _) = delete;
 
@@ -23,7 +27,7 @@ public:
   fn enqueue(Function&& func) -> void
   {
     // TODO: make normal pooling
-    pool.detach_task([this, func=std::move(func)]{
+    pool.detach_task([this, func = std::move(func)] {
       const std::lock_guard<std::mutex> lock(mtx);
 
       tasks.push_back(std::move(func));

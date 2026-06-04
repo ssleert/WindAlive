@@ -11,6 +11,8 @@ namespace ECS {
 namespace Component {
 export struct Path
 {
+  // TODO: add last point inplace instead of array last element pick
+  //       for cache friendly access
   std::vector<Vector2> points;
 };
 }
