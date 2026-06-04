@@ -12,6 +12,7 @@ public:
   {
     None,
     Tree0,
+    Rock0,
     Size,
   };
 
@@ -30,6 +31,7 @@ public:
   }
 
   fn isTree() const -> bool { return value == Tree0; }
+  fn isRock() const -> bool { return value == Rock0; }
 
   fn exist() const -> bool { return value != None; }
 

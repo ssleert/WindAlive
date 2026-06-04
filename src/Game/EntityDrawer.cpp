@@ -20,9 +20,7 @@ private:
   Game::ECS::State& entities;
 
 public:
-  EntityDrawer(
-               Game::ECS::State& entities,
-               const Game::Camera& camera)
+  EntityDrawer(Game::ECS::State& entities, const Game::Camera& camera)
     : camera(camera)
     , entities(entities)
   {

@@ -4,19 +4,18 @@ module;
 #include <stdint.h>
 #include <vector>
 #include <windalive.hpp>
-export module Game.Atlases.Tree;
+export module Game.Atlases.Rock;
 
 import Game.World.Tile;
 import Game.World.Object;
 
 namespace Game {
 namespace Atlases {
-export class Tree
+export class Rock
 {
 private:
-  // TODO: find normal sizes :)
   const int32_t width = 64;
-  const int32_t height = 128;
+  const int32_t height = 64;
 
   const std::vector<Vector2> mapping = { { 0, 0 } };
 
@@ -24,13 +23,13 @@ public:
   fn GetTextureRectangle(Game::World::Object obj) const -> Rectangle
   {
     if constexpr (!NDEBUG_VAR) {
-      if (!obj.isTree()) {
-        SPDLOG_WARN("Game::World:Object with value = {} is not a tree.",
+      if (!obj.isRock()) {
+        SPDLOG_WARN("Game::World:Object with value = {} is not a Rock.",
                     (int)obj.value);
       }
     }
 
-    auto indexTile = mapping[(int32_t)(obj.value - Game::World::Object::Tree0) %
+    auto indexTile = mapping[(int32_t)(obj.value - Game::World::Object::Rock0) %
                              mapping.size()];
     return {
       .x = (float)(indexTile.x * width),

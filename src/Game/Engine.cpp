@@ -14,6 +14,7 @@ import Game.Camera;
 import Game.TexturesLoader;
 import Game.Atlases.World;
 import Game.Atlases.Tree;
+import Game.Atlases.Rock;
 import Game.WorldDrawer;
 import Game.EntityDrawer;
 import Game.World.Generator;
@@ -32,6 +33,7 @@ private:
   const Game::TexturesLoader texturesLoader;
   const Game::Atlases::World worldAtlas;
   const Game::Atlases::Tree treeAtlas;
+  const Game::Atlases::Rock rockAtlas;
 
   Game::Camera camera;
 
@@ -52,13 +54,11 @@ public:
     world = generator.generate();
 
     worldDrawer = std::make_unique<Game::WorldDrawer>(
-      world, texturesLoader, worldAtlas, treeAtlas, camera);
+      world, texturesLoader, worldAtlas, treeAtlas, rockAtlas, camera);
 
-    entityDrawer =
-      std::make_unique<Game::EntityDrawer>(entities, camera);
+    entityDrawer = std::make_unique<Game::EntityDrawer>(entities, camera);
 
-    rlImGuiSetup(
-      true); // sets up ImGui with ether a dark or light default theme
+    rlImGuiSetup(true); // true is dark theme
   }
 
   ~Engine() { rlImGuiShutdown(); }
@@ -103,9 +103,6 @@ public:
     });
 
     rlImGuiBegin();
-    ImGui::Begin("My DearImGui Window");
-    ImGui::Text("hello, world");
-    ImGui::End();
 
     bool show = true;
     ImGui::ShowDemoWindow(&show);

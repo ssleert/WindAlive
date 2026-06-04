@@ -4,12 +4,15 @@ module;
 #include <vector>
 #include <windalive.hpp>
 export module Game.WorldDrawer;
+
 import Game.World.State;
 import Game.World.Field;
 import Game.TexturesLoader;
 import Game.Atlases.World;
 import Game.Atlases.Tree;
+import Game.Atlases.Rock;
 import Game.Camera;
+
 namespace Game {
 export class WorldDrawer
 {
@@ -21,6 +24,7 @@ private:
   const Game::TexturesLoader& texturesLoader;
   const Game::Atlases::World& worldAtlas;
   const Game::Atlases::Tree& treeAtlas;
+  const Game::Atlases::Rock& rockAtlas;
   const Game::Camera& camera;
 
   float left;
@@ -37,11 +41,13 @@ public:
               const Game::TexturesLoader& texturesLoader,
               const Game::Atlases::World& worldAtlas,
               const Game::Atlases::Tree& treeAtlas,
+              const Game::Atlases::Rock& rockAtlas,
               const Game::Camera& camera)
     : world(world)
     , texturesLoader(texturesLoader)
     , worldAtlas(worldAtlas)
     , treeAtlas(treeAtlas)
+    , rockAtlas(rockAtlas)
     , camera(camera)
   {
     fieldsWithObjects.reserve(world.width * world.height * 0.4f);
@@ -94,23 +100,36 @@ public:
   {
     for (const auto& field : fieldsWithObjects) {
       const float x = (float)(field->x * world.fieldSize);
-      const float y = (float)((field->y - 1) * world.fieldSize);
+      const float y = (float)(field->y * world.fieldSize);
 
       // TODO: move check for object type to another func
       // and return pair of texture and rectangle
       if (field->object.isTree()) {
+        const float yMinus = y - world.fieldSize;
         DrawTexturePro(
           texturesLoader.treeTiles,
           treeAtlas.GetTextureRectangle(field->object),
           (Rectangle){
             .x = x - 5 + field->object.xDiff,
-            .y = y - (float)world.fieldSize / 2 + field->object.yDiff,
+            .y = yMinus - (float)world.fieldSize / 2 + field->object.yDiff,
             .width = w,
             .height = h * 2,
           },
           (Vector2){},
           0,
           WHITE);
+      } else if (field->object.isRock()) {
+        DrawTexturePro(texturesLoader.rockTiles,
+                       rockAtlas.GetTextureRectangle(field->object),
+                       (Rectangle){
+                         .x = x - 5 + field->object.xDiff,
+                         .y = y - 3 + field->object.yDiff,
+                         .width = w,
+                         .height = h,
+                       },
+                       (Vector2){},
+                       0,
+                       WHITE);
       }
     }
   }

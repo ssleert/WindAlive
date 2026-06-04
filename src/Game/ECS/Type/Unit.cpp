@@ -1,11 +1,14 @@
 module;
 #include <BS_thread_pool.hpp>
 #include <log.hpp>
+#include <mutex>
 #include <stdint.h>
 #include <vector>
 #include <windalive.hpp>
 export module Game.ECS.Type.Unit;
 
+import Math.Vector;
+import Prelude.TaskQueue;
 import Game.ECS.Entity;
 import Game.ECS.Arrays;
 import Game.ECS.Pathfinding;
@@ -14,7 +17,6 @@ import Game.ECS.Component.Transform;
 import Game.ECS.Component.Attributes;
 import Game.ECS.Component.Path;
 import Game.World.State;
-import Math.Vector;
 
 using namespace Math;
 
@@ -28,15 +30,18 @@ private:
   Game::World::State& world;
 
   BS::thread_pool<BS::tp::none>& pool;
+  Prelude::TaskQueue& eventEueue;
 
   std::vector<Entity> freeEntities;
   Entity nextEntity = 1;
 
 public:
   Unit(BS::thread_pool<BS::tp::none>& threadPool,
+       Prelude::TaskQueue& eventQueue,
        Game::ECS::Arrays& arrays,
        Game::World::State& world)
     : pool(threadPool)
+    , eventEueue(eventQueue)
     , arrays(arrays)
     , world(world)
   {
@@ -56,19 +61,21 @@ public:
 
   fn add(Vector2 pos) -> void
   {
-    auto entity = create();
+    eventEueue.enqueue([this, pos = std::move(pos)] {
+      auto entity = create();
 
-    arrays.transformUnit.add(entity,
-                             Component::Transform{
-                               .pos = pos,
-                             });
+      arrays.transformUnit.add(entity,
+                               Component::Transform{
+                                 .pos = pos,
+                               });
 
-    arrays.physixUnit.add(entity, Component::Physix{});
-    arrays.attributesUnit.add(entity,
-                              Component::Attributes{
-                                .type = Component::Attributes::Type::Human,
-                              });
-    arrays.pathUnit.add(entity, Component::Path{});
+      arrays.physixUnit.add(entity, Component::Physix{});
+      arrays.attributesUnit.add(entity,
+                                Component::Attributes{
+                                  .type = Component::Attributes::Type::Human,
+                                });
+      arrays.pathUnit.add(entity, Component::Path{});
+    });
   }
 
   fn setDestination(Entity e, Vector2 target) -> void
@@ -88,20 +95,26 @@ public:
 
   fn setDestinationAll(Vector2 target) -> void
   {
-    const auto& components = arrays.transformUnit.getComponents();
+    eventEueue.enqueue([this, target = std::move(target)] {
+      const auto& components = arrays.transformUnit.getComponents();
 
-    pool.detach_blocks(
-      0, components.size(), [this, target = target](size_t start, size_t end) {
-        const auto& transform = arrays.transformUnit.getComponents();
-        auto& paths = arrays.pathUnit.getComponents();
+      const auto futures = pool.submit_blocks(
+        0,
+        components.size(),
+        [this, target = std::move(target)](size_t start, size_t end) {
+          const auto& transform = arrays.transformUnit.getComponents();
+          auto& paths = arrays.pathUnit.getComponents();
 
-        for (size_t i = start; i < end; ++i) {
-          auto path = Pathfinding::findPath(world, transform[i].pos, target);
-          std::reverse(path.begin(), path.end());
+          for (size_t i = start; i < end; ++i) {
+            auto path = Pathfinding::findPath(world, transform[i].pos, target);
+            std::reverse(path.begin(), path.end());
 
-          paths[i] = Component::Path{ .points = std::move(path) };
-        }
-      });
+            paths[i] = Component::Path{ .points = std::move(path) };
+          }
+        });
+
+      futures.wait();
+    });
   }
 };
 }
