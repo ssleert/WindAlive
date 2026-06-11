@@ -16,12 +16,13 @@ export struct Vision
   struct Object
   {
     Vector2 pos;
-    Game::World::Object self;
+    Game::World::Object::Value type;
   };
 
-  static constexpr uint8_t size = 32;
+  static constexpr int32_t Side = 16;
+  static constexpr int32_t Size = Side * Side;
 
-  std::array<Object, size * size> objects;
+  std::array<Object, Size> objects;
   uint16_t usedObjects;
 };
 }

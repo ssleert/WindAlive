@@ -32,8 +32,6 @@ main() -> int
     using Clock = std::chrono::steady_clock;
     using FloatSeconds = std::chrono::duration<float>;
 
-    constexpr float targetDeltaTime = 1.0f / 60.0f;
-
     auto lastTime = Clock::now();
 
     while (!stop) {

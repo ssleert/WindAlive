@@ -1,6 +1,7 @@
 module;
 #include <BS_thread_pool.hpp>
 #include <algorithm>
+#include <log.hpp>
 #include <windalive.hpp>
 export module Game.ECS.System.Vision;
 
@@ -37,22 +38,21 @@ public:
       0, components.size(), [&](const size_t start, const size_t end) {
         const auto& tc = transform.getComponents();
         auto& vc = vision.getComponents();
-        const float fieldSizeF = static_cast<float>(world.fieldSize);
-        const int32_t halfVision = 16;
+        const float fieldSizeF = (float)world.fieldSize;
+        const int32_t halfVision = Component::Vision::Side / 2;
 
         for (size_t i = start; i < end; ++i) {
           const auto& t = tc[i];
           auto& v = vc[i];
 
-          int32_t gx = static_cast<int32_t>(t.pos.x / fieldSizeF);
-          int32_t gy = static_cast<int32_t>(t.pos.y / fieldSizeF);
+          int32_t gx = (int32_t)t.pos.x / fieldSizeF;
+          int32_t gy = (int32_t)t.pos.y / fieldSizeF;
 
           v.usedObjects = 0;
-          const uint16_t capacity =
-            Component::Vision::size * Component::Vision::size;
+          const uint16_t capacity = Component::Vision::Size;
 
-          for (int32_t dy = -halfVision; dy <= halfVision; ++dy) {
-            for (int32_t dx = -halfVision; dx <= halfVision; ++dx) {
+          for (int32_t dy = -halfVision; dy < halfVision; ++dy) {
+            for (int32_t dx = -halfVision; dx < halfVision; ++dx) {
               int32_t nx = gx + dx;
               int32_t ny = gy + dy;
 
@@ -67,14 +67,12 @@ public:
               if (v.usedObjects >= capacity)
                 break; // safety, though unlikely
 
-              v.objects[v.usedObjects] =
-                Component::Vision::Object{
-                  .pos = {
-                    static_cast<float>(nx) * fieldSizeF + fieldSizeF * 0.5f,
-                    static_cast<float>(ny) * fieldSizeF + fieldSizeF * 0.5f
-                  }, 
-                  .self = field.object,
-                };
+              v.objects[v.usedObjects] = Component::Vision::Object{
+                .pos = { .x = (float)nx * fieldSizeF + fieldSizeF * 0.5f,
+                         .y = (float)ny * fieldSizeF + fieldSizeF * 0.5f },
+                .type = field.object.value,
+              };
+
               ++v.usedObjects;
             }
 

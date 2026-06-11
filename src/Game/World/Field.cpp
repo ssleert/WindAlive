@@ -17,8 +17,7 @@ export struct Field
 
   fn isCollidable() const noexcept -> bool
   {
-    return tile.value == Game::World::Tile::Rock0 ||
-           object.value != Game::World::Object::None;
+    return tile.value == Game::World::Tile::Rock0 || object.exist();
   }
 };
 }
