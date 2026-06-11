@@ -63,10 +63,6 @@ public:
               if (!field.object.exist())
                 continue;
 
-              // TODO: remove after tests
-              if (v.usedObjects >= capacity)
-                break; // safety, though unlikely
-
               v.objects[v.usedObjects] = Component::Vision::Object{
                 .pos = { .x = (float)nx * fieldSizeF + fieldSizeF * 0.5f,
                          .y = (float)ny * fieldSizeF + fieldSizeF * 0.5f },
@@ -75,9 +71,6 @@ public:
 
               ++v.usedObjects;
             }
-
-            if (v.usedObjects >= capacity)
-              break;
           }
 
           std::sort(v.objects.begin(),
