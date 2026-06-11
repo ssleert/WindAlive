@@ -6,8 +6,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if(USE_ANGLE_FROM_CHROMIUM)
-  set(_GLFW_EGL_LIBRARY libEGL.so)
-  set(_GLFW_GLESV2_LIBRARY libGLESv2.so)
+  add_definitions(-D_GLFW_EGL_LIBRARY="libEGL.so")
+  add_definitions(-D_GLFW_GLESV2_LIBRARY="libGLESv2.so")
   set(LIBANGLE /usr/lib/chromium/libEGL.so /usr/lib/chromium/libGLESv2.so)
 endif()
 
@@ -56,6 +56,10 @@ if(USE_MIMALLOC)
 endif()
 
 set(GRAPHICS GRAPHICS_API_OPENGL_ES3)
+set(OPENGL_VERSION "ES 3.0")
+add_definitions(-DOPENGL_VERSION="ES 3.0")
+#add_definitions(-DRL_DEFAULT_SHADER_VERTEX_PRECISION_HIGHP)
+#add_definitions(-DRL_DEFAULT_SHADER_FRAGMENT_PRECISION_HIGHP)
 add_subdirectory(libs/raylib)
 
 add_subdirectory(libs/spdlog)

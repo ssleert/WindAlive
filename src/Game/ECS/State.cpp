@@ -10,6 +10,7 @@ import Game.ECS.Arrays;
 import Game.ECS.Entity;
 import Game.ECS.System.Movement;
 import Game.ECS.System.PathFollowing;
+import Game.ECS.System.Vision;
 import Game.ECS.Type.Unit;
 import Game.World.State;
 
@@ -27,15 +28,18 @@ public:
   ECS::Arrays arrays;
   System::Movement movementSystem;
   System::PathFollowing pathFollowingSystem;
+  System::Vision visionSystem;
+
   Type::Unit unit;
 
   Game::World::State& world;
 
   State(Game::World::State& world)
     : pool(std::thread::hardware_concurrency)
+    , world(world)
     , movementSystem(pool)
     , pathFollowingSystem(pool)
-    , world(world)
+    , visionSystem(pool, world)
     , unit(pool, eventQueue, arrays, world)
   {
   }
@@ -50,6 +54,8 @@ public:
       arrays.transformUnit, arrays.physixUnit, arrays.pathUnit);
     pool.wait();
     movementSystem.apply(arrays.transformUnit, arrays.physixUnit);
+    pool.wait();
+    visionSystem.apply(arrays.transformUnit, arrays.visionUnit);
     pool.wait();
   }
 };

@@ -1,4 +1,5 @@
 module;
+#include <cmath>
 #include <raylib.h>
 #include <raymath.h>
 #include <rlgl.h>
@@ -12,7 +13,6 @@ private:
   Camera2D camera;
 
   float wheel;
-  Vector2 mousePos;
   Vector2 mouseWorldPos;
 
 public:
@@ -38,13 +38,17 @@ public:
 
   fn logic() -> void
   {
-    mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+    const auto mousePos = GetMousePosition();
+    mouseWorldPos = GetScreenToWorld2D(mousePos, camera);
 
-    camera.offset = GetMousePosition();
+    camera.offset = mousePos;
     camera.target = mouseWorldPos;
 
+    // TODO: issues with object flex on screen while zooming
     float scale = 0.2f * wheel;
     camera.zoom = Clamp(expf(logf(camera.zoom) + scale), 0.125f, 64.0f);
+
+    camera.zoom = std::round(camera.zoom * 100.f) / 100.f;
   }
 
   template<class Function>

@@ -1,11 +1,11 @@
 module;
 #include <stdint.h>
-export module Game.ECS.Component.Health;
+export module Game.ECS.Component.Vitals;
 
 namespace Game {
 namespace ECS {
 namespace Component {
-export struct Health
+export struct Vitals
 {
   int32_t health;
 };

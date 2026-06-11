@@ -1,4 +1,5 @@
 module;
+#include "spdlog/spdlog.h"
 #include <raylib.h>
 #include <stdint.h>
 #include <vector>

@@ -7,7 +7,7 @@ namespace ECS {
 namespace Component {
 export struct Attributes
 {
-  enum class Type : uint8_t
+  enum Type : uint8_t
   {
     Entity,
     Human,

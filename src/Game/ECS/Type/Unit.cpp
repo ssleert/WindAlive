@@ -16,6 +16,9 @@ import Game.ECS.Component.Physix;
 import Game.ECS.Component.Transform;
 import Game.ECS.Component.Attributes;
 import Game.ECS.Component.Path;
+import Game.ECS.Component.Vision;
+import Game.ECS.Component.Behavior;
+import Game.ECS.Component.Vitals;
 import Game.World.State;
 
 using namespace Math;
@@ -74,6 +77,12 @@ public:
                                 Component::Attributes{
                                   .type = Component::Attributes::Type::Human,
                                 });
+      arrays.visionUnit.add(entity, Component::Vision{});
+      arrays.behaviorUnit.add(entity, Component::Behavior{});
+      arrays.vitalsUnit.add(entity,
+                            Component::Vitals{
+                              .health = 100,
+                            });
       arrays.pathUnit.add(entity, Component::Path{});
     });
   }

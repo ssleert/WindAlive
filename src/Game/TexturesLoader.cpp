@@ -15,6 +15,10 @@ public:
     worldTiles = LoadTexture("./asset/world.png");
     treeTiles = LoadTexture("./asset/tree.png");
     rockTiles = LoadTexture("./asset/rock.png");
+
+    SetTextureWrap(worldTiles, TEXTURE_WRAP_CLAMP);
+    SetTextureWrap(treeTiles, TEXTURE_WRAP_CLAMP);
+    SetTextureWrap(rockTiles, TEXTURE_WRAP_CLAMP);
   }
 
   ~TexturesLoader()
