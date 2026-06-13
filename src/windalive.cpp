@@ -25,20 +25,16 @@ main() -> int
     [&engine] { engine->logic(); },
     [&engine] { engine->draw(); });
 
-  engine = std::make_unique<Game::Engine>(width, height);
+  engine = std::make_unique<Game::Engine>();
 
   auto stop = false;
   auto engineTickerThread = std::thread([&engine, &stop] {
     using Clock = std::chrono::steady_clock;
-    using FloatSeconds = std::chrono::duration<float>;
 
     auto lastTime = Clock::now();
 
     while (!stop) {
       auto currentTime = Clock::now();
-      float deltaTime =
-        std::chrono::duration_cast<FloatSeconds>(currentTime - lastTime)
-          .count();
       lastTime = currentTime;
 
       engine->tick();

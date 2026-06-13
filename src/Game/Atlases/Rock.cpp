@@ -25,11 +25,11 @@ public:
     if constexpr (!NDEBUG_VAR) {
       if (!obj.isRock()) {
         SPDLOG_WARN("Game::World:Object with value = {} is not a Rock.",
-                    (int)obj.value);
+                    (int)obj.type);
       }
     }
 
-    auto indexTile = mapping[(int32_t)(obj.value - Game::World::Object::Rock0) %
+    auto indexTile = mapping[(int32_t)(obj.type - Game::World::Object::Rock0) %
                              mapping.size()];
     return {
       .x = (float)(indexTile.x * width),

@@ -8,7 +8,7 @@ namespace World {
 export class Object
 {
 public:
-  enum Value : uint8_t
+  enum Type : uint8_t
   {
     None,
     Tree0,
@@ -18,29 +18,29 @@ public:
 
   // TODO: find a way for enum class methods
   // looks terrible :(
-  static fn IsTree(Value v) -> bool { return v == Tree0; }
-  static fn IsRock(Value v) -> bool { return v == Rock0; }
-  static fn Exist(Value v) -> bool { return v != None; }
+  static fn IsTree(Type v) -> bool { return v == Tree0; }
+  static fn IsRock(Type v) -> bool { return v == Rock0; }
+  static fn Exist(Type v) -> bool { return v != None; }
 
-  Object(uint8_t value, uint8_t xDiff, uint8_t yDiff)
-    : value((Value)value)
+  Object(uint8_t type, uint8_t xDiff, uint8_t yDiff)
+    : type((Type)type)
     , xDiff(xDiff)
     , yDiff(yDiff)
   {
   }
 
   Object()
-    : value(Value::None)
+    : type(Type::None)
     , xDiff(0)
     , yDiff(0)
   {
   }
 
-  fn isTree() const -> bool { return IsTree(value); }
-  fn isRock() const -> bool { return IsRock(value); }
-  fn exist() const -> bool { return Exist(value); }
+  fn isTree() const -> bool { return IsTree(type); }
+  fn isRock() const -> bool { return IsRock(type); }
+  fn exist() const -> bool { return Exist(type); }
 
-  Value value;
+  Type type;
   uint8_t xDiff;
   uint8_t yDiff;
 };

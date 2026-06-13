@@ -24,7 +24,7 @@ if(USE_STDCXX)
 endif()
 
 add_compile_options(
-  -fno-strict-aliasing
+  -fstrict-aliasing
   -Wno-nan-infinity-disabled
 )
 
@@ -34,6 +34,9 @@ if(CMAKE_BUILD_TYPE STREQUAL "Release")
     -ffast-math 
     -march=native 
     -mtune=native 
+  )
+  add_definitions(
+    -DNDEBUG -DNTRACE
   )
 endif()
 
@@ -46,7 +49,6 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
   add_compile_options(-g3)
   add_link_options(-g3)
 endif()
-
 
 if(USE_MIMALLOC)
   add_subdirectory(libs/mimalloc)
@@ -83,6 +85,15 @@ target_include_directories(windalive PRIVATE
   libs/thread-pool/include
   libs/rlImGui
   libs/imgui
+)
+
+target_compile_options(windalive PRIVATE
+  -Wall -Wextra -Wpedantic
+  -Wformat=2 -Wno-unused-parameter
+  -Wwrite-strings -Wstrict-prototypes -Wold-style-definition
+  -Wredundant-decls -Wnested-externs -Wmissing-include-dirs
+  -Wno-format-nonliteral -Wno-missing-field-initializers
+  -Wno-c99-extensions
 )
 
 target_link_libraries(windalive PRIVATE

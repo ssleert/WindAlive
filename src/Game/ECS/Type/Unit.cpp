@@ -1,7 +1,6 @@
 module;
 #include <BS_thread_pool.hpp>
 #include <log.hpp>
-#include <mutex>
 #include <stdint.h>
 #include <vector>
 #include <windalive.hpp>
@@ -43,10 +42,10 @@ public:
        Prelude::TaskQueue& eventQueue,
        Game::ECS::Arrays& arrays,
        Game::World::State& world)
-    : pool(threadPool)
-    , eventEueue(eventQueue)
-    , arrays(arrays)
+    : arrays(arrays)
     , world(world)
+    , pool(threadPool)
+    , eventEueue(eventQueue)
   {
   }
 
@@ -78,7 +77,14 @@ public:
                                   .type = Component::Attributes::Type::Human,
                                 });
       arrays.visionUnit.add(entity, Component::Vision{});
-      arrays.behaviorUnit.add(entity, Component::Behavior{});
+      arrays.behaviorUnit.add(entity, 
+          Component::Behavior{
+            .state = Component::Behavior::State::Working,
+            .tasks = {
+              Component::Behavior::Task::GetTree,
+            },
+            .usedTasks = 1,
+          });
       arrays.vitalsUnit.add(entity,
                             Component::Vitals{
                               .health = 100,

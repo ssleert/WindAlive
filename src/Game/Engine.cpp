@@ -27,9 +27,6 @@ namespace Game {
 export class Engine
 {
 private:
-  const int32_t width;
-  const int32_t height;
-
   const Game::TexturesLoader texturesLoader;
   const Game::Atlases::World worldAtlas;
   const Game::Atlases::Tree treeAtlas;
@@ -45,10 +42,8 @@ private:
   Game::ECS::State entities;
 
 public:
-  Engine(int32_t width, int32_t height)
-    : width(width)
-    , height(height)
-    , entities(world)
+  Engine()
+    : entities(world)
   {
     auto generator = Game::World::Generator(1024, 1024);
     world = generator.generate();
@@ -111,7 +106,7 @@ public:
     DrawCircleV(GetMousePosition(), 4, DARKGRAY);
     DrawTextEx(GetFontDefault(),
                TextFormat("[%i, %i]", GetMouseX(), GetMouseY()),
-               Vector2Add(GetMousePosition(), (Vector2){ -44, -24 }),
+               Vector2Add(GetMousePosition(), (Vector2){ .x = -44, .y = -24 }),
                20,
                2,
                WHITE);

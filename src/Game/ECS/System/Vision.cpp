@@ -49,7 +49,6 @@ public:
           int32_t gy = (int32_t)t.pos.y / fieldSizeF;
 
           v.usedObjects = 0;
-          const uint16_t capacity = Component::Vision::Size;
 
           for (int32_t dy = -halfVision; dy < halfVision; ++dy) {
             for (int32_t dx = -halfVision; dx < halfVision; ++dx) {
@@ -66,7 +65,7 @@ public:
               v.objects[v.usedObjects] = Component::Vision::Object{
                 .pos = { .x = (float)nx * fieldSizeF + fieldSizeF * 0.5f,
                          .y = (float)ny * fieldSizeF + fieldSizeF * 0.5f },
-                .type = field.object.value,
+                .type = field.object.type,
               };
 
               ++v.usedObjects;

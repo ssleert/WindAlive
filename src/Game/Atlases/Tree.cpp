@@ -26,11 +26,11 @@ public:
     if constexpr (!NDEBUG_VAR) {
       if (!obj.isTree()) {
         SPDLOG_WARN("Game::World:Object with value = {} is not a tree.",
-                    (int)obj.value);
+                    (int)obj.type);
       }
     }
 
-    auto indexTile = mapping[(int32_t)(obj.value - Game::World::Object::Tree0) %
+    auto indexTile = mapping[(int32_t)(obj.type - Game::World::Object::Tree0) %
                              mapping.size()];
     return {
       .x = (float)(indexTile.x * width),

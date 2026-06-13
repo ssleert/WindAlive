@@ -26,7 +26,8 @@ public:
   template<class Function>
   fn enqueue(Function&& func) -> void
   {
-    // TODO: make normal pooling
+    // TODO: make 2 vectors of tasks
+    //       switch atomic pointer on wait
     pool.detach_task([this, func = std::move(func)] {
       const std::lock_guard<std::mutex> lock(mtx);
 

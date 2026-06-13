@@ -56,11 +56,11 @@ public:
          DrawFunction&& draw,
          LogicFunction&& logic,
          InputFunction&& input)
-    : width(width)
-    , height(height)
-    , input(input)
+    : input(input)
     , logic(logic)
     , draw(draw)
+    , width(width)
+    , height(height)
   {
     SetTraceLogCallback(RaylibLogCallback);
 

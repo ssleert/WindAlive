@@ -8,15 +8,7 @@ namespace ECS {
 namespace Component {
 export struct Behavior
 {
-  enum class Task : uint8_t
-  {
-    Free,
-    GetTree,
-    GetRock,
-    Build,
-  };
-
-  enum State : uint8_t
+  enum class State : uint8_t
   {
     Idle,
     Sleeping,
@@ -24,6 +16,14 @@ export struct Behavior
   };
 
   State state;
+
+  enum class Task : uint8_t
+  {
+    Free,
+    GetTree,
+    GetRock,
+    Build,
+  };
 
   // i think 32 is still to much :(
   std::array<Task, 32> tasks;

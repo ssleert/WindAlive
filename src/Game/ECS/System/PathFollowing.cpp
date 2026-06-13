@@ -38,41 +38,40 @@ public:
     if (pathComponents.empty())
       return;
 
-    pool.detach_blocks(
-      0, pathComponents.size(), [&, speed = speed](size_t start, size_t end) {
-        auto& transforms = transform.getComponents();
-        auto& physixes = physix.getComponents();
-        auto& paths = pathArray.getComponents();
+    pool.detach_blocks(0, pathComponents.size(), [&](size_t start, size_t end) {
+      auto& transforms = transform.getComponents();
+      auto& physixes = physix.getComponents();
+      auto& paths = pathArray.getComponents();
 
-        for (size_t i = start; i < end; ++i) {
-          auto& path = paths[i];
-          auto& transform = transforms[i];
-          auto& physix = physixes[i];
+      for (size_t i = start; i < end; ++i) {
+        auto& path = paths[i];
+        auto& transform = transforms[i];
+        auto& physix = physixes[i];
+
+        if (path.points.empty()) {
+          continue;
+        }
+
+        const auto& lastPoint = path.points.back();
+        auto div = lastPoint - transform.pos;
+
+        const auto length = div.length();
+        if (length < 10.0f) {
+          path.points.pop_back();
 
           if (path.points.empty()) {
+            physix.velocity = Vector2{ 0, 0 };
             continue;
           }
 
           const auto& lastPoint = path.points.back();
-          auto div = lastPoint - transform.pos;
 
-          const auto length = div.length();
-          if (length < 10.0f) {
-            path.points.pop_back();
-
-            if (path.points.empty()) {
-              physix.velocity = Vector2{ 0, 0 };
-              continue;
-            }
-
-            const auto& lastPoint = path.points.back();
-
-            div = lastPoint - transform.pos;
-          }
-
-          physix.velocity = div.normalize();
+          div = lastPoint - transform.pos;
         }
-      });
+
+        physix.velocity = div.normalize();
+      }
+    });
   }
 };
 }
