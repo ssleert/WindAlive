@@ -1,6 +1,7 @@
 module;
 #include <array>
 #include <cstdint>
+#include <cstddef>
 #include <utility>
 #include <windalive.hpp>
 export module Game.ECS.Component.Vision;

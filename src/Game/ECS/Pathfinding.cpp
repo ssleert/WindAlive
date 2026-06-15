@@ -18,7 +18,7 @@ namespace Game {
 namespace ECS {
 
 // TODO: rewrite using more efficent heuristics (excepa Manhattan)
-// maybe use Boost.Graph
+//       maybe use A* from Boost.Graph
 export class Pathfinding
 {
 public:

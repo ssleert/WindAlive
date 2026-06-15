@@ -31,22 +31,21 @@ public:
 
   fn apply(ComponentArray<Component::Transform>& transform,
            ComponentArray<Component::Physix>& physix,
-           ComponentArray<Component::Path>& pathArray,
-           float speed = 130.0f) -> void
+           ComponentArray<Component::Path>& pathArray) -> void
   {
     const auto& pathComponents = pathArray.getComponents();
     if (pathComponents.empty())
       return;
 
     pool.detach_blocks(0, pathComponents.size(), [&](size_t start, size_t end) {
-      auto& transforms = transform.getComponents();
+      const auto& transforms = transform.getComponents();
       auto& physixes = physix.getComponents();
       auto& paths = pathArray.getComponents();
 
       for (size_t i = start; i < end; ++i) {
-        auto& path = paths[i];
-        auto& transform = transforms[i];
+        const auto& transform = transforms[i];
         auto& physix = physixes[i];
+        auto& path = paths[i];
 
         if (path.points.empty()) {
           continue;

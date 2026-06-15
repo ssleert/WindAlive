@@ -4,6 +4,7 @@ module;
 #include <windalive.hpp>
 export module Math.Vector;
 
+// TODO: change this shit to GLM
 export namespace Math {
 struct Vector2
 {

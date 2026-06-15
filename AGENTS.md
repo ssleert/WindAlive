@@ -1,156 +1,108 @@
-# AGENTS.md - WindAlive Codebase
+# AGENTS.md
 
-This document captures **non-obvious** knowledge required to work effectively in the WindAlive codebase. It assumes the agent can read individual files and focuses on architecture, flow, conventions, gotchas, and tooling that are not immediately apparent from a single source file.
+## Overview
 
-## Project Overview
+`windalive` is a small C++ game prototype that uses **C++20‑style modules** (C++26 standard), **raylib** for rendering, **ImGui** for UI, **spdlog** for logging and a tiny **thread‑pool**.  The source lives under `src/`, third‑party libraries are in `libs/` and asset files live in `asset/`.
 
-WindAlive is a 2D top-down tile-based prototype built with Raylib and C++26 modules. It features:
-- A large procedurally generated world (currently 1024×1024 random tiles).
-- Texture atlas rendering with culling.
-- Pannable/zoomable camera.
-- Strict separation between `Application` (window/loop) and `Game` (simulation/rendering).
+## Building the Project
 
-The project heavily uses C++ modules (`.cpp` files exporting `module` declarations).
+### Using the provided Makefile
+```
+# Generate Ninja build files
+make USE_ANGLE_FROM_CHROMIUM=ON BUILD_TYPE=Debug USE_STDCXX=ON USE_MIMALLOC=OFF  
 
-## Tooling & Commands
+# Build (default uses Debug with ASan/UBSan)
+make build
 
-### Build System
-
-The project uses a hybrid CMake + Makefile setup:
-
-```bash
-make generate    # Configures CMake (Ninja, Debug by default, OpenGL 4.3)
-make build       # Builds with Ninja (parallel)
-make clean       # Removes build directory
+# Clean
+make clean
 ```
 
-- **Default compiler**: `clang++` (set via `CC`/`CXX` in Makefile).
-- **Build directory**: `./build`
-- **Compile commands**: Generated (`build/compile_commands.json`).
-- Key CMake flags set:
-  - C++26 (`CMAKE_CXX_STANDARD 26`)
-  - IPO/LTO enabled
-  - `-ffast-math -march=native -mtune=native`
-  - Raylib with `OPENGL_VERSION=4.3`
+| Variable | Default | Effect |
+|---|---|---|
+| `BUILD_TYPE` | `Debug` | `Release` enables optimisations and disables sanitisers. |
+| `DEBUGGER` | `OFF` | When `ON` the debug build does not enable ASan/UBSan. |
+| `USE_ANGLE_FROM_CHROMIUM` | `OFF` | Enables EGL/EGL+GLESV2 flags for raylib. |
+| `USE_STDCXX` | `OFF` | Links against libc++ on systems that provide it. |
+| `USE_MIMALLOC` | `OFF` | Statically links mimalloc for allocation performance. |
 
-**Important**: Modules are collected via `file(GLOB_RECURSE)` in `CMakeLists.txt` and added as a `FILE_SET CXX_MODULES`. Adding a new module file requires re-running `make generate` or manually refreshing CMake.
+### Manual CMake/Ninja
+```bash
+# From project root
+cmake -G Ninja -B build \
+  -DCMAKE_BUILD_TYPE=Debug \
+  -DUSE_ANGLE_FROM_CHROMIUM=ON \
+  -DUSE_STDCXX=ON \
+  -DUSE_MIMALLOC=OFF \
+  -DDEBUGGER=OFF
+cmake --build build --parallel
+```
 
-### Running
+**Tip**: Use `-DCMAKE_BUILD_TYPE=Debug` for quick builds with sanitisers.
 
-After build:
+## Running the Application
+
+After a successful build the executable is `build/windalive`.  Run it from the project root so that relative asset paths (e.g. `./asset/world.png`) resolve:
 ```bash
 ./build/windalive
 ```
-
-No command-line arguments are currently used.
-
-### Logging
-
-- spdlog with `windalive.hpp` defining `SPDLOG_ACTIVE_LEVEL` based on `NDEBUG`.
-- Raylib logs are redirected to spdlog via `SetTraceLogCallback`.
-- Debug builds: `LOG_ALL`; Release: `LOG_WARNING`.
-
-## Architecture & Control Flow
-
-### High-Level Structure
-
-```
-main()
-  └─ Application::Window (template)
-       ├─ input()  lambda → Engine::input()
-       ├─ logic()  lambda → Engine::logic()
-       └─ draw()   lambda → Engine::draw()
-
-Game::Engine
-  ├─ owns World::State (generated)
-  ├─ owns WorldDrawer
-  ├─ owns Camera (Camera2D)
-  └─ owns TexturesLoader (RAII)
-```
-
-### Module Dependencies (import graph highlights)
-
-- `Application.Window` — top-level, depends on nothing game-specific.
-- `Game.Engine` — orchestrates everything, imports many modules.
-- `Game.WorldDrawer` — performs frustum culling using current `Camera2D` values.
-- `Game.Camera` — mutates its internal `Camera2D`; provides `draw(Function&&)` RAII wrapper (`BeginMode2D`/`EndMode2D`).
-
-### Data Flow
-
-1. **World Generation**: `Game::World::Generator` creates flat `std::vector<Field>` (no 2D grid, just linear list).
-2. **Rendering**: `WorldDrawer::draw()` does simple AABB culling against projected camera bounds, then `DrawTexturePro` from atlas.
-3. **Camera**: 
-   - `input()`: drag panning (left mouse).
-   - `logic()`: zoom (mouse wheel) + sets `offset = mouse position` (unusual centering behavior).
-
-**Note**: Camera logic is split across `input()` and `logic()` in a non-obvious way. Zoom and mouse world position updates happen in `logic()`.
+If you run from another directory, either copy the `asset/` directory next to the binary or set `LD_LIBRARY_PATH` accordingly.
 
 ## Code Organization
 
-All source is in `src/` (flat, no subdirectories beyond the module files themselves).
-
-Modules are named with `export module X.Y.Z;` style (namespace hierarchy reflected in module names).
-
-Header-only style include guard: `WINDALIVE_HPP` with `#define fn auto`.
-
-## Naming & Style Conventions
-
-- **Modules**: `Application.*`, `Game.*`, `Game.World.*`, `Game.Atlases.*`
-- **Functions**: `fn name() -> return_type` (macro in `windalive.hpp`)
-- **Types**: `PascalCase` for classes/structs/enums.
-- **Members**: `camelCase` or `snake_case` mixed (mostly camelCase).
-- **Raylib types**: Used directly (`Vector2`, `Rectangle`, `Camera2D`, etc.).
-- **Constants**: Often `const int32_t` members.
-
-### Lambda Capture Patterns
-
-In `main()` the `Window` is constructed with lambdas capturing `engine` by reference. `engine` is allocated *after* the `Window` object — this works because the lambdas are only invoked inside `loop()`, but it is fragile.
-
-## Important Gotchas & Non-Obvious Behaviors
-
-1. **Engine Allocation Order**:
-   - `Application::Window` is constructed first.
-   - `Game::Engine* engine;` is declared before.
-   - `engine = new Game::Engine(...)` happens *after* `Window` construction.
-   - Lambdas close over the pointer — valid only because execution is later. Changing initialization order can break things.
-
-2. **WorldDrawer Culling**:
-   - Culling math assumes camera `offset` and `target` are in a specific state (updated in `logic()`).
-   - Uses screen-space projection — sensitive to when `logic()` vs `draw()` is called.
-
-3. **Camera Behavior**:
-   - `camera.offset = GetMousePosition()` every frame in `logic()`.
-   - `camera.target = mouseWorldPos` — this creates a "mouse-centered" feel rather than traditional free camera.
-
-4. **Module + CMake Fragility**:
-   - Any new `.cpp` file must be picked up by the `GLOB` in `CMakeLists.txt`.
-   - Module interface changes can cause obscure compilation errors due to C++26 module support being relatively new/unstable in some toolchains.
-
-5. **Random Generation**:
-   - `std::srand(123123)` in `main()` — deterministic for now.
-   - `Generator` fills `width × height` but loop uses `world.height` for both x and y (potential bug if width != height).
-
-6. **Texture Atlas**:
-   - Hardcoded 64×64 tiles, mapping only first 5 tiles in `Game::Atlases::World`.
-   - `Tile` enum has more values than the mapping array — modulo used.
-
-7. **Performance**:
-   - Full world vector (1M+ `Field` structs) iterated every frame (though culled).
-   - No spatial partitioning yet.
-
-## Development Patterns
-
-- **RAII**: `TexturesLoader` loads/unloads texture. `Window` handles init/shutdown implicitly via Raylib.
-- **Template Window**: Generic over input/logic/draw callables — allows flexible composition.
-- **Const correctness**: Many `draw()` methods are `const` (good practice observed).
-- **No tests**: No test directory or CMake test setup visible.
-
-## When Modifying
-
-- Adding new systems: Follow `Game::` module hierarchy and import style.
-- Changing camera: Understand split `input()`/`logic()` responsibilities.
-- World changes: Update both `Generator` and `WorldDrawer` culling logic together.
-- New assets: Update `TexturesLoader` and atlas mapping.
-
-This document will evolve as the codebase grows. Always verify module dependencies and rebuild configuration after structural changes.
 ```
+├── src/                 # C++ modules and game logic
+├── libs/                # Third‑party libraries (raylib, spdlog, imgui, ...)
+├── asset/               # PNG/TEX assets used at runtime
+├── Makefile             # Convenience wrapper around CMake/Ninja
+├── CMakeLists.txt       # Root CMake configuration
+└── AGENTS.md            # This file
+```
+
+### Core Modules
+* `Application.Window` – thin wrapper around raylib’s windowing and log callbacks.
+* `Game.Engine` – main game loop, tick/logic/draw.
+* `Game.World` – grid‑based world representation.
+* `Game.ECS` – small entity‑component‑system implementation.
+
+Modules are compiled as **C++ modules** (`module;` header and `export module`).  The project uses the `fn` macro to simplify function definitions:
+```cpp
+#define fn auto
+
+fn foo() -> int { return 42; }
+```
+
+## Naming & Style
+* Functions: defined with `fn` and return type after `->`.
+* Variables: snake_case.
+* Types: PascalCase (e.g., `Game::Engine`).
+* Modules: dot‑separated, e.g., `Application.Window`.
+* Header guards are used (`#ifndef WINDALIVE_HPP` etc.).
+
+## Dependencies
+* **raylib** – lightweight cross‑platform graphics.
+* **ImGui** – immediate‑mode UI.
+* **rlImGui** – ImGui integration for raylib.
+* **spdlog** – high‑performance logging.
+* **thread‑pool** – small header‑only thread‑pool.
+* **mimalloc** – optional static allocator.
+
+## Testing
+There are currently no unit tests.  The repository focuses on the game prototype and relies on manual testing.
+
+## Gotchas & Non‑Obvious Points
+* **C++ Modules** require a compiler that supports C++20 modules (Clang 15+ or GCC 12+).  The Makefile defaults to `clang++`.
+* The `Makefile` sets `-fsanitize=address,undefined` for Debug builds unless `DEBUGGER=ON`.
+* Asset paths are hard‑coded relative to the working directory; always run from the project root or adjust `LoadTexture("./asset/...")` paths.
+* The `-DUSE_ANGLE_FROM_CHROMIUM` flag is only relevant on Linux/Android when using EGL.
+* `NDEBUG_VAR` is a compile‑time flag that switches the raylib trace log level.
+
+## Conventions
+* All source files in `src/` end with `*.cpp` and use module syntax.
+* Public API is exported via `export module` and `export` keyword.
+* The build system always generates a `build/` directory; never commit it.
+* `Makefile` variables are used to toggle build options; modify them before invoking `make generate`.
+
+---
+
+> **Note**: This file is automatically updated when the repository changes.  If you add new modules or change build options, regenerate AGENTS.md.
