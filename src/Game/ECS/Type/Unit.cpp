@@ -75,16 +75,14 @@ public:
       arrays.attributesUnit.add(entity,
                                 Component::Attributes{
                                   .type = Component::Attributes::Type::Human,
+                                  .index = entity,
                                 });
       arrays.visionUnit.add(entity, Component::Vision{});
-      arrays.behaviorUnit.add(entity, 
-          Component::Behavior{
-            .state = Component::Behavior::State::Working,
-            .tasks = {
-              Component::Behavior::Task::GetTree,
-            },
-            .usedTasks = 1,
-          });
+
+      auto b = Component::Behavior{};
+      b.setDefaultPriorities();
+      arrays.behaviorUnit.add(entity, std::move(b));
+
       arrays.vitalsUnit.add(entity,
                             Component::Vitals{
                               .health = 100,

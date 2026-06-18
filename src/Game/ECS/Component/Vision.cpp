@@ -1,7 +1,7 @@
 module;
 #include <array>
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 #include <utility>
 #include <windalive.hpp>
 export module Game.ECS.Component.Vision;
@@ -18,7 +18,8 @@ export struct Vision
 {
   struct Object
   {
-    Vector2 pos;
+    uint16_t x;
+    uint16_t y;
     Game::World::Object::Type type;
   };
 

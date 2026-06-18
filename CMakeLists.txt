@@ -65,6 +65,7 @@ add_definitions(-DOPENGL_VERSION="ES 3.0")
 add_subdirectory(libs/raylib)
 
 add_subdirectory(libs/spdlog)
+add_subdirectory(libs/boost)
 
 add_executable(windalive src/windalive.cpp 
   libs/rlImGui/rlImGui.cpp
@@ -99,6 +100,7 @@ target_compile_options(windalive PRIVATE
 target_link_libraries(windalive PRIVATE
   raylib
   spdlog
+  Boost::container
   ${LIBANGLE}
 )
 

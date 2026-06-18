@@ -10,8 +10,8 @@ namespace Game {
 namespace World {
 export struct Field
 {
-  int32_t x;
-  int32_t y;
+  uint16_t x;
+  uint16_t y;
   Game::World::Tile tile;
   Game::World::Object object;
 

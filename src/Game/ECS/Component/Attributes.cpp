@@ -2,12 +2,14 @@ module;
 #include <stdint.h>
 export module Game.ECS.Component.Attributes;
 
+import Game.ECS.Entity;
+
 namespace Game {
 namespace ECS {
 namespace Component {
 export struct Attributes
 {
-  enum Type : uint8_t
+  enum class Type : uint8_t
   {
     Entity,
     Human,
@@ -15,6 +17,7 @@ export struct Attributes
 
   Type type;
   uint8_t variation;
+  Entity index;
 };
 }
 }

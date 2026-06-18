@@ -1,4 +1,5 @@
 module;
+#include <cstdint>
 export module Game.ECS.Component.Transform;
 
 import Math.Vector;
@@ -11,7 +12,7 @@ namespace Component {
 export struct Transform
 {
   Vector2 pos;
-  float rotation;
+  int16_t rotation;
 };
 }
 }

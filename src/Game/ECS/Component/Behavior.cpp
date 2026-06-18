@@ -1,33 +1,54 @@
 module;
-#include <array>
+#include <boost/container/static_vector.hpp>
 #include <cstdint>
+#include <windalive.hpp>
 export module Game.ECS.Component.Behavior;
+
+import Math.Vector;
+
+using namespace Math;
 
 namespace Game {
 namespace ECS {
 namespace Component {
 export struct Behavior
 {
-  enum class State : uint8_t
+  struct Task
   {
-    Idle,
-    Sleeping,
-    Working,
+    enum class Type : uint8_t
+    {
+      Free,
+      GetTree,
+      GetRock,
+      Build,
+      Repair,
+      Sleep,
+      Eat,
+      Fight,
+      Patrol,
+      Size
+    };
+
+    Type type;
+    uint8_t priority;
   };
 
-  State state;
+  static constexpr size_t MaxPriorities = 16;
+  boost::container::static_vector<Task::Type, MaxPriorities> tasksPriorities;
+  Task currentTask;
 
-  enum class Task : uint8_t
+  uint8_t hunger;
+  uint8_t energy;
+  int8_t mood; // minus vibe)
+
+  fn setDefaultPriorities() noexcept -> void
   {
-    Free,
-    GetTree,
-    GetRock,
-    Build,
-  };
-
-  // i think 32 is still to much :(
-  std::array<Task, 32> tasks;
-  uint8_t usedTasks;
+    tasksPriorities = {
+      Task::Type::Fight,   Task::Type::Repair,  Task::Type::Build,
+      Task::Type::GetRock, Task::Type::GetTree, Task::Type::Eat,
+      Task::Type::Sleep,   Task::Type::Patrol,  Task::Type::Free,
+    };
+  }
 };
 }
 }

@@ -63,8 +63,8 @@ public:
                 continue;
 
               v.objects[v.usedObjects] = Component::Vision::Object{
-                .pos = { .x = (float)nx * fieldSizeF + fieldSizeF * 0.5f,
-                         .y = (float)ny * fieldSizeF + fieldSizeF * 0.5f },
+                .x = (uint16_t)((float)nx * fieldSizeF + fieldSizeF * 0.5f),
+                .y = (uint16_t)((float)ny * fieldSizeF + fieldSizeF * 0.5f),
                 .type = field.object.type,
               };
 
@@ -76,8 +76,18 @@ public:
                     v.objects.begin() + v.usedObjects,
                     [&](const Component::Vision::Object& a,
                         const Component::Vision::Object& b) {
-                      float distA = (a.pos - t.pos).lengthSquared();
-                      float distB = (b.pos - t.pos).lengthSquared();
+                      Vector2 aPos = {
+                        .x = (float)a.x,
+                        .y = (float)a.y,
+                      };
+
+                      Vector2 bPos = {
+                        .x = (float)b.x,
+                        .y = (float)b.y,
+                      };
+
+                      float distA = (aPos - t.pos).lengthSquared();
+                      float distB = (bPos - t.pos).lengthSquared();
                       return distA < distB;
                     });
         }

@@ -7,7 +7,7 @@ namespace ECS {
 namespace Component {
 export struct Vitals
 {
-  int32_t health;
+  uint8_t health;
 };
 }
 }

@@ -36,8 +36,8 @@ public:
       .fields = std::vector<Game::World::Field>(),
     };
 
-    for (int32_t y = 0; y < world.height; ++y) {
-      for (int32_t x = 0; x < world.height; ++x) {
+    for (uint16_t y = 0; y < world.height; ++y) {
+      for (uint16_t x = 0; x < world.width; ++x) {
         auto idx = std::rand() % (int)Game::World::Tile::Size;
 
         world.fields.push_back(Game::World::Field{

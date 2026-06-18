@@ -5,9 +5,13 @@ module;
 #include <windalive.hpp>
 export module Game.ECS.System.Behavior;
 
+import Game.ECS.Entity;
 import Game.ECS.ComponentArray;
 import Game.ECS.Component.Vision;
 import Game.ECS.Component.Behavior;
+import Game.ECS.Component.Attributes;
+import Game.ECS.Component.Transform;
+import Game.ECS.Component.Path;
 import Game.World.Object;
 
 namespace Game {
@@ -25,67 +29,35 @@ public:
   }
 
   // TODO: refactor
-  fn apply(ComponentArray<Component::Behavior>& behavior,
-           const ComponentArray<Component::Vision>& vision) -> void
+  fn apply(const ComponentArray<Component::Transform>& transform,
+           const ComponentArray<Component::Vision>& vision,
+           const ComponentArray<Component::Attributes>& attributes,
+           ComponentArray<Component::Behavior>& behavior,
+           ComponentArray<Component::Path>& path) -> void
   {
-    const auto& components = behavior.getComponents();
+    const auto& components = transform.getComponents();
     pool.detach_blocks(
       0, components.size(), [&](const size_t start, const size_t end) {
-        auto& bc = behavior.getComponents();
+        const auto& tc = transform.getComponents();
         const auto& vc = vision.getComponents();
+        const auto& ac = attributes.getComponents();
+        auto& bc = behavior.getComponents();
+        auto& pc = path.getComponents();
 
         for (size_t i = start; i < end; ++i) {
-          auto& b = bc[i];
-          const auto& v = vc[i];
-
-          switch (b.state) {
-            case Component::Behavior::State::Idle: {
-              // TODO: implement Levy flight
-              //       https://en.wikipedia.org/wiki/Levy_flight
-              break;
-            }
-            case Component::Behavior::State::Sleeping: {
-              // TODO: implement find of sleep place
-              break;
-            }
-            case Component::Behavior::State::Working: {
-              for (size_t taskIdx = 0; taskIdx < b.usedTasks; ++taskIdx) {
-                const auto& task = b.tasks[taskIdx];
-
-                switch (task) {
-                  case Component::Behavior::Task::Free: {
-                    // TODO
-                    break;
-                  }
-                  case Component::Behavior::Task::GetTree: {
-                    const auto [tree, found] =
-                      v.findNearestObject([](const auto& obj) {
-                        return Game::World::Object::IsTree(obj.type);
-                      });
-
-                    if (!found) {
-                      break;
-                    }
-
-                    SPDLOG_INFO(
-                      "nearest tree = [{},{}]", tree.pos.x, tree.pos.y);
-                    break;
-                  };
-                  case Component::Behavior::Task::GetRock: {
-                    // TODO
-                    break;
-                  }
-                  case Component::Behavior::Task::Build: {
-                    // TODO
-                    break;
-                  }
-                }
-              }
-              break;
-            }
-          }
+          Tick(bc[i], tc[i], vc[i], pc[i], ac[i].index);
         }
       });
+  }
+
+  fn Tick(Component::Behavior& bc,
+          const Component::Transform& tc,
+          const Component::Vision& vc,
+          Component::Path& pc,
+          Entity entity) -> void
+  {
+    // TODO
+    return;
   }
 };
 }
