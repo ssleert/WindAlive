@@ -28,7 +28,7 @@ add_compile_options(
   -Wno-nan-infinity-disabled
 )
 
-add_link_options(-Wl,--build-id=none)
+add_link_options(-fuse-ld=lld -Wl,--build-id=none)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
