@@ -62,7 +62,7 @@ public:
     visionSystem.apply(arrays.transformUnit, arrays.visionUnit);
     pool.wait();
 
-    //behaviorSystem.apply(arrays.behaviorUnit, arrays.visionUnit);
+    // behaviorSystem.apply(arrays.behaviorUnit, arrays.visionUnit);
     pool.wait();
   }
 };

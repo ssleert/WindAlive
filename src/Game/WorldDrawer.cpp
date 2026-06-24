@@ -85,8 +85,8 @@ public:
       if (x + w > left && x < right && y + h > top && y < bottom) {
         DrawTexturePro(texturesLoader.worldTiles,
                        worldAtlas.GetTextureRectangle(field.tile),
-                       (Rectangle){ .x = x, .y = y, .width = w, .height = h },
-                       (Vector2){},
+                       Rectangle{ .x = x, .y = y, .width = w, .height = h },
+                       Vector2{},
                        0,
                        WHITE);
 
@@ -110,25 +110,25 @@ public:
         DrawTexturePro(
           texturesLoader.treeTiles,
           treeAtlas.GetTextureRectangle(field->object),
-          (Rectangle){
+          Rectangle{
             .x = x - 5 + field->object.xDiff,
             .y = yMinus - (float)world.fieldSize / 2 + field->object.yDiff,
             .width = w,
             .height = h * 2,
           },
-          (Vector2){},
+          Vector2{},
           0,
           WHITE);
       } else if (field->object.isRock()) {
         DrawTexturePro(texturesLoader.rockTiles,
                        rockAtlas.GetTextureRectangle(field->object),
-                       (Rectangle){
+                       Rectangle{
                          .x = x - 5 + field->object.xDiff,
                          .y = y - 3 + field->object.yDiff,
                          .width = w,
                          .height = h,
                        },
-                       (Vector2){},
+                       Vector2{},
                        0,
                        WHITE);
       }

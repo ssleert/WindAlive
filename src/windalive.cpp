@@ -6,6 +6,7 @@
 
 import Application.Window;
 import Game.Engine;
+import Game.Constant;
 import Game.TexturesLoader;
 
 fn
@@ -54,8 +55,9 @@ main() -> int
       auto frameTime =
         std::chrono::duration_cast<DurationMs>(Clock::now() - currentTime);
 
-      if (frameTime < DurationMs(1000 / 60)) {
-        std::this_thread::sleep_for(DurationMs(1000 / 60) - frameTime);
+      if (frameTime < DurationMs(1000 / Game::Constant::Tickrate)) {
+        std::this_thread::sleep_for(
+          DurationMs(1000 / Game::Constant::Tickrate) - frameTime);
       }
 
       auto now = Clock::now();

@@ -1,8 +1,8 @@
 module;
 #include <BS_thread_pool.hpp>
-#include <log.hpp>
 #include <stdint.h>
 #include <vector>
+#include <log.hpp>
 #include <windalive.hpp>
 export module Game.ECS.Type.Unit;
 
@@ -32,7 +32,7 @@ private:
   Game::World::State& world;
 
   BS::thread_pool<BS::tp::none>& pool;
-  Prelude::TaskQueue& eventEueue;
+  Prelude::TaskQueue& eventQueue;
 
   std::vector<Entity> freeEntities;
   Entity nextEntity = 1;
@@ -45,7 +45,7 @@ public:
     : arrays(arrays)
     , world(world)
     , pool(threadPool)
-    , eventEueue(eventQueue)
+    , eventQueue(eventQueue)
   {
   }
 
@@ -63,7 +63,7 @@ public:
 
   fn add(Vector2 pos) -> void
   {
-    eventEueue.enqueue([this, pos = std::move(pos)] {
+    eventQueue.enqueue([this, pos = std::move(pos)] {
       auto entity = create();
 
       arrays.transformUnit.add(entity,
@@ -79,7 +79,11 @@ public:
                                 });
       arrays.visionUnit.add(entity, Component::Vision{});
 
-      auto b = Component::Behavior{};
+      auto b = Component::Behavior{
+        .hunger = 255,
+        .energy = 255,
+        .mood = 0,
+      };
       b.setDefaultPriorities();
       arrays.behaviorUnit.add(entity, std::move(b));
 
@@ -108,7 +112,7 @@ public:
 
   fn setDestinationAll(Vector2 target) -> void
   {
-    eventEueue.enqueue([this, target = std::move(target)] {
+    eventQueue.enqueue([this, target = std::move(target)] {
       const auto& components = arrays.transformUnit.getComponents();
 
       const auto futures = pool.submit_blocks(

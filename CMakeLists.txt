@@ -28,9 +28,12 @@ add_compile_options(
   -Wno-nan-infinity-disabled
 )
 
+add_link_options(-Wl,--build-id=none)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
   set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
   add_compile_options(
+    -fno-stack-protector
     -ffast-math 
     -march=native 
     -mtune=native 
@@ -94,7 +97,6 @@ target_compile_options(windalive PRIVATE
   -Wwrite-strings -Wstrict-prototypes -Wold-style-definition
   -Wredundant-decls -Wnested-externs -Wmissing-include-dirs
   -Wno-format-nonliteral -Wno-missing-field-initializers
-  -Wno-c99-extensions
 )
 
 target_link_libraries(windalive PRIVATE

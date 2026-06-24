@@ -106,7 +106,7 @@ public:
     DrawCircleV(GetMousePosition(), 4, DARKGRAY);
     DrawTextEx(GetFontDefault(),
                TextFormat("[%i, %i]", GetMouseX(), GetMouseY()),
-               Vector2Add(GetMousePosition(), (Vector2){ .x = -44, .y = -24 }),
+               Vector2Add(GetMousePosition(), Vector2{ .x = -44, .y = -24 }),
                20,
                2,
                WHITE);
