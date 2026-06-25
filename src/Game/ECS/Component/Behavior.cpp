@@ -26,6 +26,7 @@ export struct Behavior
       Eat,
       Fight,
       Patrol,
+      Idle,
       Size
     };
 
@@ -46,7 +47,7 @@ export struct Behavior
     tasksPriorities = {
       Task::Type::Fight,   Task::Type::Repair,  Task::Type::Build,
       Task::Type::GetRock, Task::Type::GetTree, Task::Type::Eat,
-      Task::Type::Sleep,   Task::Type::Patrol,  Task::Type::Free,
+      Task::Type::Sleep,   Task::Type::Patrol,  Task::Type::Idle,
     };
   }
 };
